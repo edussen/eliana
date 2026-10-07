@@ -100,6 +100,24 @@
   .vacio{padding:60px 16px;text-align:center;color:var(--texto-tenue)}
   .vacio .ph{font-size:2.6rem;display:block;margin-bottom:8px}
 
+  .btn.peligro{color:#b91c1c;border-color:#fecaca}
+  .btn.peligro:hover{background:#fef2f2}
+  .btn.peligro.solido{background:#dc2626;border-color:#dc2626;color:#fff}
+  .btn.peligro.solido:hover{background:#b91c1c}
+  .btn.peligro.solido:disabled{opacity:.45;cursor:not-allowed}
+  .barra-borrar{position:fixed;left:0;right:0;bottom:0;z-index:45;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;padding:12px 16px;background:#1c1f23;color:#fff;box-shadow:0 -6px 24px rgba(0,0,0,.25)}
+  .barra-borrar[hidden]{display:none}
+  .barra-borrar span{font-weight:700;font-size:.92rem;margin-right:auto}
+  .barra-borrar .btn{padding:9px 14px}
+  .barra-borrar .btn:not(.peligro){color:var(--texto)}
+  body.seleccionando main{padding-bottom:110px}
+  .tarjeta.sel{outline:3px solid var(--marca);outline-offset:-3px}
+  .check{position:absolute;right:10px;bottom:10px;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.92);border:2px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.3);color:transparent;font-size:1.1rem}
+  .tarjeta.sel .check{background:var(--marca);color:#fff}
+  .tarjeta-correo{display:flex;align-items:center;gap:6px;margin-top:8px;font-size:.8rem;font-weight:700;color:#1d4ed8;overflow-wrap:anywhere}
+  .meta-correo{display:flex;align-items:center;gap:6px;margin-top:-8px}
+  .meta-correo a{color:#1d4ed8;font-weight:700;overflow-wrap:anywhere}
+  .insignia.abajo{left:10px;top:auto;bottom:10px;background:#1d4ed8;display:inline-flex;align-items:center;gap:5px}
   .rejilla{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
   .tarjeta{display:flex;flex-direction:column;text-align:left;background:var(--superficie);border-radius:var(--r-md);overflow:hidden;box-shadow:var(--sombra);transition:transform .15s ease}
   .tarjeta:hover{transform:translateY(-3px)}
@@ -164,6 +182,10 @@
   .firma{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;margin-top:24px}
   .firma .con{font-family:'Caveat',cursive;font-size:1.5rem;color:#6d5f3a}
   .firma .quien{font-family:'Caveat',cursive;font-weight:700;font-size:2.3rem;line-height:1.05;color:var(--marca-oscuro);overflow-wrap:anywhere}
+  .polaroides{flex:none;display:flex;flex-wrap:wrap;justify-content:flex-end;align-items:flex-end;gap:10px 8px;max-width:360px}
+  .polaroides.varias .polaroid{width:112px;padding:6px 6px 8px}
+  .polaroides.varias .polaroid:nth-child(even){transform:rotate(-3deg)}
+  .polaroides.varias .polaroid small{font-size:.9rem}
   .polaroid{flex:none;width:150px;padding:8px 8px 10px;background:#fff;border-radius:3px;box-shadow:0 6px 18px rgba(0,0,0,.2);transform:rotate(3deg)}
   .polaroid .marco{aspect-ratio:4/5;background:#f3f1ea;overflow:hidden;display:grid;place-items:center;color:#c4bda9;font-size:2rem}
   .polaroid .marco img{width:100%;height:100%;object-fit:cover;display:block;cursor:zoom-in}
@@ -222,7 +244,9 @@
         <button type="button" class="chip on" data-f="todas">Todas</button>
         <button type="button" class="chip" data-f="texto">Escritas</button>
         <button type="button" class="chip" data-f="mano">A mano</button>
+        <button type="button" class="chip" data-f="fotos">Varias fotos</button>
       </div>
+      <button type="button" class="btn" id="btnSeleccionar"><i class="ph ph-check-square" aria-hidden="true"></i><span>Seleccionar</span></button>
     </div>
     <div class="rejilla" id="rejilla"></div>
     <div class="vacio" id="vacio" hidden><i class="ph ph-envelope-simple" aria-hidden="true"></i><span id="vacioTxt">Todavía no ha llegado ninguna carta.</span></div>
@@ -230,23 +254,32 @@
   </main>
 </div>
 
+<div class="barra-borrar" id="barraBorrar" hidden>
+  <span id="selTxt">Ninguna seleccionada</span>
+  <button type="button" class="btn" id="btnSelTodas">Seleccionar todas</button>
+  <button type="button" class="btn peligro solido" id="btnBorrarSel" disabled><i class="ph ph-trash" aria-hidden="true"></i>Borrar</button>
+  <button type="button" class="btn" id="btnSelCancelar">Cancelar</button>
+</div>
+
 <div class="velo" id="velo" hidden>
   <div class="panel" role="dialog" aria-modal="true" aria-label="Carta">
     <div class="panel-cab">
       <button type="button" class="btn principal" id="btnPng"><i class="ph ph-download-simple" aria-hidden="true"></i><span>Descargar carta</span></button>
-      <button type="button" class="btn" id="btnFoto"><i class="ph ph-image" aria-hidden="true"></i>Foto</button>
+      <button type="button" class="btn" id="btnFoto"><i class="ph ph-image" aria-hidden="true"></i><span>Foto</span></button>
       <button type="button" class="btn" id="btnTexto"><i class="ph ph-copy" aria-hidden="true"></i>Copiar texto</button>
+      <button type="button" class="btn peligro" id="btnBorrar"><i class="ph ph-trash" aria-hidden="true"></i>Borrar</button>
       <span class="espacio"></span>
       <button type="button" class="cerrar" id="btnCerrar" aria-label="Cerrar"><i class="ph ph-x" aria-hidden="true"></i></button>
     </div>
     <p class="meta" id="meta"></p>
+    <p class="meta meta-correo" id="metaCorreo" hidden><i class="ph ph-envelope-simple" aria-hidden="true"></i><a id="correoLink"></a></p>
     <div class="aviso-sin" id="avisoSin" hidden><i class="ph ph-warning" aria-hidden="true"></i><span>Esta carta no tiene la foto guardada. Si la persona la vuelve a enviar desde su dispositivo, aparecerá completa.</span></div>
     <article class="carta" id="carta">
       <div class="carta-cab"><span class="para">Para Eliana</span><span class="fecha">8 oct 2026</span></div>
       <div id="cuerpo"></div>
       <div class="firma">
         <div><div class="con">Con cariño,</div><div class="quien" id="quien"></div></div>
-        <div class="polaroid"><div class="marco" id="marco"><i class="ph ph-camera" aria-hidden="true"></i></div><small id="pie"></small></div>
+        <div class="polaroides" id="polaroides"></div>
       </div>
     </article>
     <section class="hist" id="hist" hidden>
@@ -264,7 +297,8 @@ const API_URL="https://cartas-eliana.mrluki4656.workers.dev";
 const CLAVE_GUARDADA="cartas-eliana-admin";
 const $=id=>document.getElementById(id);
 
-let clave="",cartas=[],filtro="todas",abierta=null;
+let clave="",cartas=[],filtro="todas",abierta=null,modoSel=false;
+const seleccion=new Set();
 const cacheImg=new Map(),pendientes=new Map();
 
 function aviso(t){
@@ -293,6 +327,7 @@ function imagen(id){
 
 function limpiar(){
   detenerSondeo();
+  modoSel=false;seleccion.clear();actualizarBarra();
   clave="";cartas=[];cacheImg.forEach(u=>URL.revokeObjectURL(u));cacheImg.clear();
   $("rejilla").innerHTML="";
 }
@@ -319,36 +354,87 @@ async function cargar(){
 
 function visibles(){
   const q=$("buscar").value.trim().toLowerCase();
-  return cartas.filter(c=>(filtro==="todas"||c.modo===filtro)&&(!q||c.nombre.toLowerCase().includes(q)||(c.texto||"").toLowerCase().includes(q)));
+  return cartas.filter(c=>(filtro==="todas"||(filtro==="fotos"?(c.fotos||0)>1:c.modo===filtro))&&(!q||c.nombre.toLowerCase().includes(q)||(c.texto||"").toLowerCase().includes(q)||(c.correo||"").toLowerCase().includes(q)));
 }
 
 function pintarLista(){
   const lista=visibles(),caja=$("rejilla");
   caja.innerHTML="";
-  const esc=cartas.filter(c=>c.modo==="texto").length,man=cartas.length-esc;
-  $("resumen").textContent=cartas.length?cartas.length+(cartas.length===1?" carta":" cartas")+" · "+esc+" escritas · "+man+" a mano":"Sin cartas todavía";
+  const esc=cartas.filter(c=>c.modo==="texto").length,man=cartas.length-esc,varias=cartas.filter(c=>(c.fotos||0)>1).length;
+  $("resumen").textContent=cartas.length?cartas.length+(cartas.length===1?" carta":" cartas")+" · "+esc+" escritas · "+man+" a mano"+(varias?" · "+varias+" con varias fotos":""):"Sin cartas todavía";
   $("vacio").hidden=lista.length>0;
   $("vacioTxt").textContent=cartas.length?"No hay cartas que coincidan con tu búsqueda.":"Todavía no ha llegado ninguna carta.";
   const obs="IntersectionObserver" in window?new IntersectionObserver(es=>es.forEach(en=>{
     if(!en.isIntersecting)return;obs.unobserve(en.target);ponerMiniatura(en.target);
   }),{rootMargin:"200px"}):null;
   lista.forEach(c=>{
-    const b=document.createElement("button");b.type="button";b.className="tarjeta";
+    const b=document.createElement("button");b.type="button";b.className="tarjeta"+(modoSel&&seleccion.has(c.id)?" sel":"");b.dataset.id=c.id;
     const mini=document.createElement("div");mini.className="miniatura";mini.dataset.foto=c.foto_id||"";
     mini.innerHTML="<i class=\"ph ph-camera\"></i>";
     const ins=document.createElement("span");ins.className="insignia";ins.textContent=c.modo==="mano"?"A mano · "+c.hojas+(c.hojas===1?" hoja":" hojas"):"Escrita";
     mini.append(ins);
+    if((c.fotos||0)>1){const f=document.createElement("span");f.className="insignia abajo";f.innerHTML="<i class=\"ph ph-images\"></i>";f.append(document.createTextNode(c.fotos+" fotos"));mini.append(f);}
+    if(modoSel){const ck=document.createElement("span");ck.className="check";ck.innerHTML="<i class=\"ph ph-check\"></i>";mini.append(ck);}
     const ed=c.ediciones||0,editada=ed>0||c.actualizada>c.creada+1000;
     if(editada){const e=document.createElement("span");e.className="insignia der";e.textContent=ed>1?"Editada ×"+ed:"Editada";mini.append(e);}
     const cu=document.createElement("div");cu.className="tarjeta-cuerpo";
     const n=document.createElement("b");n.textContent=c.nombre;
     const t=document.createElement("time");t.textContent=fecha(c.creada)+(ed?" · editada "+plural(ed,"vez","veces"):(editada?" · editada":""));
     const p=document.createElement("p");p.textContent=c.modo==="texto"?c.texto:"Carta escrita a mano";
-    cu.append(n,t,p);b.append(mini,cu);
-    b.addEventListener("click",()=>abrir(c));
+    cu.append(n,t,p);
+    if(c.correo){const m=document.createElement("div");m.className="tarjeta-correo";m.innerHTML="<i class=\"ph ph-envelope-simple\"></i>";m.append(document.createTextNode(c.correo));cu.append(m);}
+    b.append(mini,cu);
+    b.addEventListener("click",()=>{if(modoSel)alternarSel(c.id);else abrir(c);});
     caja.append(b);
     if(obs)obs.observe(mini);else ponerMiniatura(mini);
   });
+}
+
+function actualizarBarra(){
+  $("barraBorrar").hidden=!modoSel;
+  document.body.classList.toggle("seleccionando",modoSel);
+  $("btnSeleccionar").querySelector("span").textContent=modoSel?"Terminar":"Seleccionar";
+  const n=seleccion.size;
+  $("selTxt").textContent=n?(n===1?"1 carta seleccionada":n+" cartas seleccionadas"):"Toca las cartas que quieras borrar";
+  $("btnBorrarSel").disabled=!n;
+}
+
+function alternarSel(id){
+  if(seleccion.has(id))seleccion.delete(id);else seleccion.add(id);
+  const el=document.querySelector(".tarjeta[data-id=\""+id+"\"]");
+  if(el)el.classList.toggle("sel",seleccion.has(id));
+  actualizarBarra();
+}
+
+function alternarModoSel(){
+  modoSel=!modoSel;seleccion.clear();
+  actualizarBarra();pintarLista();
+}
+
+async function apiBorrar(id){
+  const r=await fetch(API_URL+"/api/cartas/"+id,{method:"DELETE",headers:{Authorization:"Bearer "+clave}});
+  if(r.status===401){const e=new Error("clave");e.codigo=401;throw e;}
+  return r;
+}
+
+async function borrarCartas(lista){
+  if(!lista.length)return false;
+  const nombres=lista.map(c=>"«"+c.nombre+"»").join(", ");
+  const archivos=lista.reduce((a,c)=>a+(c.fotos||0)+(c.hojas||0),0);
+  const pregunta="¿Borrar "+(lista.length===1?"esta carta":"estas "+lista.length+" cartas")+"?\n\n"+nombres+"\n\nSe borrarán también sus "+plural(archivos,"foto u hoja","fotos y hojas")+" y el historial de cambios. No se puede deshacer.";
+  if(!confirm(pregunta))return false;
+  let borradas=0,fallos=0;
+  for(const c of lista){
+    try{
+      const r=await apiBorrar(c.id);
+      if(r.ok||r.status===404)borradas++;else fallos++;
+    }catch(e){
+      if(e.codigo===401){limpiar();mostrarAcceso("La clave no es correcta.");return false;}
+      fallos++;
+    }
+  }
+  aviso(fallos?"Se borraron "+borradas+" y fallaron "+fallos+". Intenta de nuevo con las que faltan.":(borradas===1?"Se borró la carta.":"Se borraron "+borradas+" cartas."));
+  return borradas>0;
 }
 
 function ponerMiniatura(mini){
@@ -376,16 +462,23 @@ async function abrir(c){
   $("velo").scrollTop=0;
   const ed=c.ediciones||0;
   $("meta").textContent="Enviada el "+fecha(c.creada)+(c.actualizada>c.creada+1000?" · "+(ed?"editada "+plural(ed,"vez","veces")+", ":"")+"última edición "+fecha(c.actualizada):"");
+  $("metaCorreo").hidden=!c.correo;
+  if(c.correo){$("correoLink").textContent=c.correo;$("correoLink").href="mailto:"+encodeURIComponent(c.correo).replace(/%40/g,"@");}
   $("hist").hidden=true;$("histLista").innerHTML="";
   let det=null;
-  const cargaDetalle=(c.modo==="mano"||ed>0)?api("/api/cartas/"+c.id).then(r=>r.json()).catch(()=>null):Promise.resolve(null);
+  const cargaDetalle=api("/api/cartas/"+c.id).then(r=>r.json()).catch(()=>null);
   $("quien").textContent=c.nombre;
-  $("pie").textContent=c.nombre+" y Eliana";
   $("avisoSin").hidden=!!c.foto_id;
   $("btnFoto").hidden=!c.foto_id;
+  $("btnFoto").querySelector("span").textContent=(c.fotos||1)>1?"Fotos ("+c.fotos+")":"Foto";
   $("btnTexto").hidden=c.modo!=="texto";
-  const marco=$("marco");marco.innerHTML="<i class=\"ph ph-camera\"></i>";
-  if(c.foto_id)imagen(c.foto_id).then(u=>{if(abierta!==c)return;const im=document.createElement("img");im.src=u;im.alt="Foto con Eliana";im.addEventListener("click",()=>verGrande(u));marco.innerHTML="";marco.append(im);}).catch(()=>aviso("No se pudo cargar la foto."));
+  c.listaFotos=c.foto_id?[{id:c.foto_id}]:[];
+  dibujarPolaroides(c,c.listaFotos);
+  cargaDetalle.then(d=>{
+    if(abierta!==c||!d||!d.carta||!d.carta.fotos||!d.carta.fotos.length)return;
+    c.listaFotos=d.carta.fotos;
+    dibujarPolaroides(c,c.listaFotos);
+  });
 
   const cuerpo=$("cuerpo");cuerpo.innerHTML="";
   if(c.modo==="texto"){
@@ -410,6 +503,18 @@ async function abrir(c){
     if(!det)det=await cargaDetalle;
     if(abierta===c&&det&&det.carta)pintarHistorial(det.carta);
   }
+}
+
+function dibujarPolaroides(c,lista){
+  const polas=$("polaroides");polas.innerHTML="";
+  polas.classList.toggle("varias",lista.length>1);
+  (lista.length?lista:[null]).forEach((f,i)=>{
+    const p=document.createElement("div");p.className="polaroid";
+    const m=document.createElement("div");m.className="marco";m.innerHTML="<i class=\"ph ph-camera\"></i>";
+    if(f)imagen(f.id).then(u=>{if(abierta!==c)return;const im=document.createElement("img");im.src=u;im.alt="Foto "+(i+1)+" con Eliana";im.addEventListener("click",()=>verGrande(u));m.innerHTML="";m.append(im);}).catch(()=>aviso("No se pudo cargar una foto."));
+    const s=document.createElement("small");s.textContent=c.nombre+" y Eliana";
+    p.append(m,s);polas.append(p);
+  });
 }
 
 function diffPalabras(a,b){
@@ -503,10 +608,11 @@ function pintarHistorial(carta){
         cuerpos.push(bloque("Mensaje",antesAhora(columna("antes","Antes",antes.texto||"(vacío)"),columna("ahora","Ahora",ahora.texto||"(vacío)"))));
       }
     }
-    const fa=antes.foto?antes.foto.bytes:null,fb=ahora.foto?ahora.foto.bytes:null;
-    if(fa!==fb){
-      chips.append(chip("Foto con Eliana"));
-      cuerpos.push(bloque("Foto con Eliana",antesAhora(columna("antes","Antes",minis(antes.foto?[antes.foto]:[])),columna("ahora","Ahora",minis(ahora.foto?[ahora.foto]:[])))));
+    const fotosDe=e=>e.fotos||(e.foto?[e.foto]:[]);
+    const fa=fotosDe(antes),fb=fotosDe(ahora);
+    if(fa.map(f=>f.bytes).join(",")!==fb.map(f=>f.bytes).join(",")){
+      chips.append(chip("Fotos con Eliana"));
+      cuerpos.push(bloque("Fotos con Eliana",antesAhora(columna("antes","Antes ("+fa.length+")",minis(fa)),columna("ahora","Ahora ("+fb.length+")",minis(fb)))));
     }
     if(antes.hojas.map(h=>h.bytes).join(",")!==ahora.hojas.map(h=>h.bytes).join(",")){
       chips.append(chip("Hojas a mano"));
@@ -522,7 +628,7 @@ function pintarHistorial(carta){
     const ab=document.createElement("div");ab.className="anterior-cuerpo";
     const nom=document.createElement("div");nom.className="nom";nom.textContent="De: "+antes.nombre+" · "+forma(antes.modo);ab.append(nom);
     if(antes.modo==="texto"){const pre=document.createElement("pre");pre.textContent=antes.texto;ab.append(pre);}
-    ab.append(minis([...(antes.foto?[antes.foto]:[]),...antes.hojas]));
+    ab.append(minis([...fotosDe(antes),...antes.hojas]));
     det.append(ab);card.append(det);
     caja.append(card);
   }
@@ -534,6 +640,23 @@ function chip(t){const s=document.createElement("span");s.textContent=t;return s
 function cerrar(){abierta=null;$("velo").hidden=true;document.body.style.overflow="";}
 
 $("btnCerrar").addEventListener("click",cerrar);
+
+$("btnSeleccionar").addEventListener("click",alternarModoSel);
+$("btnSelCancelar").addEventListener("click",alternarModoSel);
+$("btnSelTodas").addEventListener("click",()=>{
+  const ids=visibles().map(c=>c.id),todas=ids.length&&ids.every(id=>seleccion.has(id));
+  ids.forEach(id=>{if(todas)seleccion.delete(id);else seleccion.add(id);});
+  pintarLista();actualizarBarra();
+});
+$("btnBorrarSel").addEventListener("click",async()=>{
+  const lista=cartas.filter(c=>seleccion.has(c.id));
+  if(await borrarCartas(lista)){modoSel=false;seleccion.clear();actualizarBarra();await cargar();}
+});
+$("btnBorrar").addEventListener("click",async()=>{
+  if(!abierta)return;
+  const c=abierta;
+  if(await borrarCartas([c])){cerrar();await cargar();}
+});
 $("velo").addEventListener("click",e=>{if(e.target===$("velo"))cerrar();});
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("velo").hidden)cerrar();});
 
@@ -552,8 +675,14 @@ $("btnPng").addEventListener("click",async()=>{
 
 $("btnFoto").addEventListener("click",async()=>{
   if(!abierta||!abierta.foto_id)return;
-  try{bajar(await imagen(abierta.foto_id),nombreArchivo(abierta,"jpg").replace("carta-para-eliana-","foto-con-eliana-"));}
-  catch(e){aviso("No se pudo descargar la foto.");}
+  const lista=abierta.listaFotos&&abierta.listaFotos.length?abierta.listaFotos:[{id:abierta.foto_id}];
+  try{
+    for(let i=0;i<lista.length;i++){
+      const nombre=nombreArchivo(abierta,"jpg").replace("carta-para-eliana-","foto-con-eliana-").replace(".jpg",lista.length>1?"-"+(i+1)+".jpg":".jpg");
+      bajar(await imagen(lista[i].id),nombre);
+      if(i<lista.length-1)await new Promise(r=>setTimeout(r,300));
+    }
+  }catch(e){aviso("No se pudo descargar la foto.");}
 });
 
 $("btnTexto").addEventListener("click",async()=>{
@@ -692,7 +821,7 @@ function cuerpoVivo(d,ahora){
   const st=document.createElement("div");st.className="disp-stats";
   const datos=[
     d.modo==="mano"?"Carta a mano"+(d.hojas?" · "+plural(d.hojas,"hoja","hojas"):""):plural(d.palabras,"palabra","palabras")+" · "+plural(d.caracteres,"carácter","caracteres"),
-    d.foto?"Foto con Eliana subida":"Sin foto todavía",
+    d.foto?(d.foto===1?"1 foto con Eliana subida":d.foto+" fotos con Eliana subidas"):"Sin fotos todavía",
     "Salió "+plural(d.salidas,"vez","veces"),
     d.ua,
     "Primera vez: "+fecha(d.primera),
