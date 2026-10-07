@@ -107,10 +107,10 @@
   .seg button:focus-visible,.btn:focus-visible,.zona:focus-within,.quitar:focus-visible,.pb:focus-visible{outline:3px solid #3b82f6;outline-offset:2px}
 
   label.campo{display:block;font-size:.84rem;font-weight:700;color:var(--texto-suave);margin-bottom:8px}
-  textarea,input[type=text]{width:100%;padding:14px 16px;background:var(--superficie);border:1.5px solid var(--borde);border-radius:var(--r-md);font-size:1rem;line-height:1.6;transition:border-color .15s ease,box-shadow .15s ease}
+  textarea,input[type=text],input[type=email]{width:100%;padding:14px 16px;background:var(--superficie);border:1.5px solid var(--borde);border-radius:var(--r-md);font-size:1rem;line-height:1.6;transition:border-color .15s ease,box-shadow .15s ease}
   input.grande{padding:17px 18px;font-size:1.25rem;font-weight:600}
   textarea{min-height:230px;resize:vertical;overflow:hidden}
-  textarea:focus,input[type=text]:focus{outline:none;border-color:var(--marca);box-shadow:0 0 0 4px rgba(200,0,13,.1)}
+  textarea:focus,input[type=text]:focus,input[type=email]:focus{outline:none;border-color:var(--marca);box-shadow:0 0 0 4px rgba(200,0,13,.1)}
   textarea::placeholder,input::placeholder{color:var(--texto-tenue)}
   .contador{display:flex;justify-content:space-between;gap:10px;margin-top:8px;font-size:.78rem;color:var(--texto-tenue)}
 
@@ -179,7 +179,11 @@
   .chip-env .ph{font-size:1.1rem}
   .velo{position:fixed;inset:0;z-index:70;background:rgba(18,20,26,.62);display:flex;justify-content:center;align-items:flex-start;overflow-y:auto;padding:24px 14px}
   .velo[hidden]{display:none}
-  .modal{width:100%;max-width:560px;background:var(--superficie);border-radius:20px;padding:20px 20px 22px;box-shadow:0 20px 50px rgba(0,0,0,.3)}
+  .modal-icono.ok{background:#dcfce7;color:#16a34a}
+  .cerrar-esq{position:absolute;right:12px;top:12px}
+  .correo-campo{margin:6px 0 10px;text-align:left;line-height:1.5}
+  #formCorreo .error{margin-bottom:6px;text-align:left}
+  .modal{position:relative;width:100%;max-width:560px;background:var(--superficie);border-radius:20px;padding:20px 20px 22px;box-shadow:0 20px 50px rgba(0,0,0,.3)}
   .modal-cab{display:flex;align-items:center;justify-content:space-between;gap:12px}
   .modal-cab h2{font-size:1.2rem;font-weight:800;letter-spacing:-.02em}
   .cerrar{flex:none;width:40px;height:40px;border-radius:50%;background:#fff;border:1.5px solid var(--borde);display:grid;place-items:center;font-size:1.2rem}
@@ -442,6 +446,21 @@
 </main>
 
 <footer class="pie">Hecho con cariño por tus amigos · 8 de octubre de 2026</footer>
+
+<div class="velo" id="veloEnviado" hidden>
+  <div class="modal modal-chico" role="dialog" aria-modal="true" aria-labelledby="tEnviado">
+    <button type="button" class="cerrar cerrar-esq" id="cerrarEnviado" aria-label="Cerrar"><i class="ph ph-x" aria-hidden="true"></i></button>
+    <div class="modal-icono ok"><i class="ph ph-check-circle" aria-hidden="true"></i></div>
+    <h2 id="tEnviado">¡Tu carta fue enviada!</h2>
+    <p class="modal-sub" id="enviadoSub">Ya llegó a quien organiza la sorpresa. Puedes cerrar esta ventana cuando quieras.</p>
+    <form id="formCorreo" novalidate>
+      <label class="campo correo-campo" for="correo">Para mantenerte notificado/a, proporciónanos un correo electrónico. Si no tienes, déjalo en blanco.</label>
+      <input type="email" id="correo" placeholder="tucorreo@ejemplo.com" autocomplete="email" inputmode="email" maxlength="120">
+      <div class="error" id="errCorreo" role="alert"><i class="ph ph-warning-circle" aria-hidden="true"></i><span></span></div>
+      <div class="modal-acciones"><button type="submit" class="btn principal" id="btnListo"><span>Listo</span></button></div>
+    </form>
+  </div>
+</div>
 
 <div class="velo" id="veloFotos" hidden>
   <div class="modal modal-chico" role="dialog" aria-modal="true" aria-labelledby="tFotos">
@@ -775,14 +794,14 @@ async function migrarAntigua(){
 
 async function guardarEnviada(){
   if(!envio)return;
-  await guardarRegistro({id:envio.id,token:envio.token,huella:envio.huella,fecha:envio.fecha,nombre:$("nombre").value.trim(),modo:estado.modo,texto:$("texto").value,fotos:estado.fotos,paginas:estado.paginas});
+  await guardarRegistro({id:envio.id,token:envio.token,huella:envio.huella,fecha:envio.fecha,correo:envio.correo||"",nombre:$("nombre").value.trim(),modo:estado.modo,texto:$("texto").value,fotos:estado.fotos,paginas:estado.paginas});
   try{localStorage.setItem(CLAVE_ACTUAL,envio.id);}catch(e){}
   enviadas=await leerEnviadas();
   pintarContadorEnviadas();
 }
 
 function aplicarRegistro(g){
-  envio={id:g.id,token:g.token,huella:g.huella,fecha:g.fecha};
+  envio={id:g.id,token:g.token,huella:g.huella,fecha:g.fecha,correo:g.correo||""};
   $("nombre").value=g.nombre||"";$("texto").value=g.texto||"";
   estado.modo=g.modo==="mano"?"mano":"texto";
   estado.fotos=Array.isArray(g.fotos)?g.fotos.slice():(g.foto?[g.foto]:[]);
@@ -928,17 +947,19 @@ async function enviarCarta(){
     };
     const cabeceras={"Content-Type":"application/json"};
     let r,datos;
+    const correoPrevio=envio&&envio.correo?envio.correo:"";
+    let edicion=!!envio;
     if(envio){
       r=await fetch(API_URL+"/api/cartas/"+envio.id,{method:"PUT",headers:{...cabeceras,"X-Token":envio.token},body:JSON.stringify(cuerpo)});
-      if(r.status===404){envio=null;}
+      if(r.status===404){envio=null;edicion=false;}
     }
     if(!envio){r=await fetch(API_URL+"/api/cartas",{method:"POST",headers:cabeceras,body:JSON.stringify(cuerpo)});}
     datos=await r.json().catch(()=>({}));
     if(!r.ok||!datos.ok){aviso(datos.error||"No se pudo enviar. Intenta de nuevo.");return;}
-    envio={id:datos.id,token:datos.token||(envio&&envio.token),huella:huella(),fecha:datos.actualizada};
+    envio={id:datos.id,token:datos.token||(envio&&envio.token),huella:huella(),fecha:datos.actualizada,correo:edicion?correoPrevio:""};
     await guardarEnviada();
     latido("activo");
-    aviso("¡Carta enviada! Quedó guardada en este dispositivo.");
+    abrirModalEnviado(edicion);
   }catch(e){
     aviso("No se pudo enviar. Revisa tu conexión y vuelve a intentar.");
   }finally{
@@ -946,6 +967,44 @@ async function enviarCarta(){
     actualizarEnvio();
   }
 }
+
+const FORMATO_CORREO=/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+function abrirModalEnviado(actualizada){
+  $("tEnviado").textContent=actualizada?"¡Cambios enviados!":"¡Tu carta fue enviada!";
+  $("enviadoSub").textContent=(actualizada?"Tu carta ya quedó actualizada. ":"Ya llegó a quien organiza la sorpresa. ")+"Puedes cerrar esta ventana cuando quieras.";
+  $("correo").value=envio&&envio.correo?envio.correo:"";
+  $("errCorreo").classList.remove("ver");
+  $("veloEnviado").hidden=false;document.body.style.overflow="hidden";
+  $("tEnviado").setAttribute("tabindex","-1");$("tEnviado").focus({preventScroll:true});
+}
+function cerrarModalEnviado(){$("veloEnviado").hidden=true;document.body.style.overflow="";}
+
+$("formCorreo").addEventListener("submit",async e=>{
+  e.preventDefault();
+  const v=$("correo").value.trim(),actual=envio&&envio.correo?envio.correo:"";
+  const err=$("errCorreo");err.classList.remove("ver");
+  if(v&&(v.length>120||!FORMATO_CORREO.test(v))){err.querySelector("span").textContent="Escribe un correo válido, por ejemplo nombre@correo.com, o déjalo en blanco.";err.classList.add("ver");$("correo").focus();return;}
+  if(v===actual||!envio){cerrarModalEnviado();return;}
+  const boton=$("btnListo"),span=boton.querySelector("span"),previo=span.textContent;
+  boton.disabled=true;span.textContent="Guardando…";
+  try{
+    const r=await fetch(API_URL+"/api/cartas/"+envio.id+"/correo",{method:"POST",headers:{"Content-Type":"application/json","X-Token":envio.token},body:JSON.stringify({correo:v})});
+    const d=await r.json().catch(()=>({}));
+    if(!r.ok||!d.ok){err.querySelector("span").textContent=d.error||"No se pudo guardar el correo. Intenta de nuevo.";err.classList.add("ver");return;}
+    envio.correo=d.correo||"";
+    await guardarEnviada();
+    cerrarModalEnviado();
+    aviso(envio.correo?"Correo guardado. ¡Gracias!":"Listo.");
+  }catch(x){
+    err.querySelector("span").textContent="No se pudo guardar. Revisa tu conexión e intenta de nuevo.";err.classList.add("ver");
+  }finally{
+    boton.disabled=false;span.textContent=previo;
+  }
+});
+$("cerrarEnviado").addEventListener("click",cerrarModalEnviado);
+$("veloEnviado").addEventListener("click",e=>{if(e.target===$("veloEnviado"))cerrarModalEnviado();});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("veloEnviado").hidden)cerrarModalEnviado();});
 
 $("btnEnviar").addEventListener("click",enviarCarta);
 ["btnEditar","btnLapiz"].forEach(id=>$(id).addEventListener("click",()=>mostrarPaso(2,true)));
