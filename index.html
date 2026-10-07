@@ -228,6 +228,17 @@
   .firma-txt .quien.vacio{color:#c4bda9}
   .polaroid{flex:none;width:150px;padding:8px 8px 10px;background:#fff;border-radius:3px;box-shadow:0 6px 18px rgba(0,0,0,.2);transform:rotate(3deg)}
   .polaroid .marco{aspect-ratio:4/5;background:#f3f1ea;overflow:hidden;display:grid;place-items:center;color:#c4bda9;font-size:2rem}
+  .polaroides{flex:none;display:flex;flex-wrap:wrap;justify-content:flex-end;align-items:flex-end;gap:10px 8px;max-width:360px}
+  .polaroides .polaroid{width:150px}
+  .polaroides.varias .polaroid{width:112px;padding:6px 6px 8px}
+  .polaroides.varias .polaroid:nth-child(even){transform:rotate(-3deg)}
+  .polaroides.varias .polaroid small{font-size:.9rem}
+  .modal-chico{max-width:420px;text-align:center}
+  .modal-icono{display:inline-grid;place-items:center;width:56px;height:56px;margin-bottom:10px;border-radius:50%;background:var(--oro-suave);color:#b07b00;font-size:1.8rem}
+  .modal-chico h2{font-size:1.3rem;font-weight:800;letter-spacing:-.02em}
+  .modal-chico .modal-sub{margin:8px 0 18px}
+  .modal-acciones{display:flex;flex-direction:column;gap:8px}
+  .modal-acciones .btn{width:100%}
   .polaroid .marco img{width:100%;height:100%;object-fit:cover;display:block}
   .polaroid small{display:block;margin-top:7px;text-align:center;font-family:'Caveat',cursive;font-size:1.05rem;color:#6d5f3a;line-height:1.1}
 
@@ -307,6 +318,7 @@
       <input class="grande" type="text" id="nombre" placeholder="Tu nombre" maxlength="80" autocomplete="name">
       <div class="error" id="errNombre" role="alert"><i class="ph ph-warning-circle" aria-hidden="true"></i><span>Escribe tu nombre para firmar la carta.</span></div>
       <div class="firma-demo"><span>Firmarás así</span><strong class="vacio" id="firmaDemo">Tu nombre</strong></div>
+      <p class="nota-privada"><i class="ph ph-eye" aria-hidden="true"></i><span>Mientras escribes, quien organiza la sorpresa puede ver que estás aquí, en qué paso vas y lo que llevas escrito, para saber cómo va todo. Tus fotos solo se envían cuando pulsas «Enviar».</span></p>
       <div class="nav-pasos"><span></span><button type="button" class="btn principal" data-ir="2">Siguiente<i class="ph ph-arrow-right" aria-hidden="true"></i></button></div>
     </section>
 
@@ -322,7 +334,7 @@
         </div>
         <div id="panelTexto" hidden>
           <label class="campo" for="texto">Tu mensaje para Eliana</label>
-          <textarea id="texto" placeholder="Querida Eliana,..."></textarea>
+          <textarea id="texto" placeholder="Querida Eliana, hoy quiero decirte lo importante que eres para mí…"></textarea>
           <div class="contador"><span id="contadorTxt">0 palabras · 0 caracteres</span><span>Sin límite</span></div>
         </div>
         <div id="panelMano">
@@ -348,28 +360,27 @@
     </section>
 
     <section class="panel" data-paso="3" hidden aria-labelledby="h3p">
-      <div class="tit"><span class="ico"><i class="ph ph-camera" aria-hidden="true"></i></span><h2 id="h3p">Ahora, tu foto con Eliana</h2></div>
-      <p class="ayuda">Esta foto aparecerá junto a tu firma, como un recuerdo pegado a la carta.</p>
+      <div class="tit"><span class="ico"><i class="ph ph-camera" aria-hidden="true"></i></span><h2 id="h3p">Ahora, tus fotos con Eliana</h2></div>
+      <p class="ayuda">Estas fotos aparecerán junto a tu firma, como recuerdos pegados a la carta. Puedes subir hasta 6.</p>
 
       <div class="reglas">
-        <b><i class="ph ph-info" aria-hidden="true"></i>Tiene que ser una foto tuya con ella</b>
+        <b><i class="ph ph-info" aria-hidden="true"></i>Tienen que ser fotos tuyas con ella</b>
         <ul>
           <li>Que salgan los dos: tú y Eliana, juntos.</li>
-          <li>Cualquier foto sirve: de una fiesta, un viaje o un día cualquiera. Puede ser la de tu celular.</li>
-          <li>Elige una donde se vean bien las caras.</li>
+          <li>Nos encantaría que fueran varias: de una fiesta, un viaje o un día cualquiera. Pueden ser las de tu celular.</li>
+          <li>Elige unas donde se vean bien las caras.</li>
         </ul>
       </div>
 
-      <div class="foto-fila">
-        <div class="foto-vista" id="fotoVista"><i class="ph ph-camera" aria-hidden="true"></i></div>
-        <label class="zona" id="zonaFoto">
-          <i class="ph ph-upload-simple" aria-hidden="true"></i>
-          <b id="fotoTxt">Subir foto</b>
-          <span>Toca para elegirla o arrástrala aquí. JPG o PNG.</span>
-          <input type="file" id="foto" accept="image/*">
-        </label>
-      </div>
-      <div class="error" id="errFoto" role="alert"><i class="ph ph-warning-circle" aria-hidden="true"></i><span>Sube una foto tuya con Eliana.</span></div>
+      <label class="zona" id="zonaFoto">
+        <i class="ph ph-upload-simple" aria-hidden="true"></i>
+        <b id="fotoTxt">Subir fotos</b>
+        <span>Toca para elegirlas o arrástralas aquí. Puedes elegir varias a la vez. JPG o PNG.</span>
+        <input type="file" id="foto" accept="image/*" multiple>
+      </label>
+      <div class="paginas" id="fotosGrid"></div>
+      <div class="contador"><span id="fotosCuenta">0 de 6 fotos</span></div>
+      <div class="error" id="errFoto" role="alert"><i class="ph ph-warning-circle" aria-hidden="true"></i><span>Sube al menos una foto tuya con Eliana.</span></div>
 
       <div class="nav-pasos">
         <button type="button" class="btn texto" data-ir="2"><i class="ph ph-arrow-left" aria-hidden="true"></i>Atrás</button>
@@ -406,10 +417,7 @@
             <div class="con">Con cariño,</div>
             <div class="quien vacio" id="cartaNombre">Tu nombre</div>
           </div>
-          <div class="polaroid">
-            <div class="marco" id="cartaFoto"><i class="ph ph-camera" aria-hidden="true"></i></div>
-            <small id="cartaPie">Tu foto con Eliana</small>
-          </div>
+          <div class="polaroides" id="cartaFotos"></div>
         </div>
       </article>
       </div>
@@ -434,6 +442,18 @@
 </main>
 
 <footer class="pie">Hecho con cariño por tus amigos · 8 de octubre de 2026</footer>
+
+<div class="velo" id="veloFotos" hidden>
+  <div class="modal modal-chico" role="dialog" aria-modal="true" aria-labelledby="tFotos">
+    <div class="modal-icono"><i class="ph ph-images" aria-hidden="true"></i></div>
+    <h2 id="tFotos">¿Solo una foto?</h2>
+    <p class="modal-sub">Nos gustaría que fueran más de una. Varias fotos juntos hacen la carta mucho más especial para Eliana.</p>
+    <div class="modal-acciones">
+      <button type="button" class="btn principal" id="btnMasFotos"><i class="ph ph-plus" aria-hidden="true"></i>Agregar más fotos</button>
+      <button type="button" class="btn texto" id="btnUnaFoto">Continuar con una sola foto</button>
+    </div>
+  </div>
+</div>
 
 <div class="velo" id="veloEnviadas" hidden>
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="tEnviadas">
@@ -463,7 +483,9 @@ let envio=null;
 let enviadas=[];
 
 const $=id=>document.getElementById(id);
-const estado={modo:"mano",paginas:[],foto:null};
+const MAX_FOTOS=6;
+const estado={modo:"mano",paginas:[],fotos:[]};
+let aceptoUna=false;
 
 function cuentaRegresiva(){
   const h=new Date(),hoy=new Date(h.getFullYear(),h.getMonth(),h.getDate());
@@ -530,14 +552,34 @@ function pintar(){
   const nombre=$("nombre").value.trim();
   const q=$("cartaNombre");q.textContent=nombre||"Tu nombre";q.classList.toggle("vacio",!nombre);
   const fd=$("firmaDemo");fd.textContent=nombre||"Tu nombre";fd.classList.toggle("vacio",!nombre);
-  $("cartaPie").textContent=nombre?nombre+" y Eliana":"Tu foto con Eliana";
-  const marco=$("cartaFoto");marco.innerHTML="";
-  if(estado.foto){const im=document.createElement("img");im.src=estado.foto;im.alt="Foto con Eliana";marco.append(im);}
-  else marco.innerHTML="<i class=\"ph ph-camera\"></i>";
-  const v=$("fotoVista");v.innerHTML="";
-  if(estado.foto){const im=document.createElement("img");im.src=estado.foto;im.alt="";v.append(im);$("fotoTxt").textContent="Cambiar foto";}
-  else{v.innerHTML="<i class=\"ph ph-camera\"></i>";$("fotoTxt").textContent="Subir foto";}
+  const pie=nombre?nombre+" y Eliana":"Tu foto con Eliana";
+  const polas=$("cartaFotos");polas.innerHTML="";
+  polas.classList.toggle("varias",estado.fotos.length>1);
+  (estado.fotos.length?estado.fotos:[null]).forEach((src,i)=>{
+    const p=document.createElement("div");p.className="polaroid";
+    const m=document.createElement("div");m.className="marco";
+    if(src){const im=document.createElement("img");im.src=src;im.alt="Foto "+(i+1)+" con Eliana";m.append(im);}
+    else m.innerHTML="<i class=\"ph ph-camera\"></i>";
+    const s=document.createElement("small");s.textContent=pie;
+    p.append(m,s);polas.append(p);
+  });
+  pintarFotos();
   guardarBorrador();
+}
+
+function pintarFotos(){
+  const grid=$("fotosGrid");grid.innerHTML="";
+  estado.fotos.forEach((src,i)=>{
+    const d=document.createElement("div");d.className="pagina";
+    const im=document.createElement("img");im.src=src;im.alt="Foto "+(i+1);
+    const n=document.createElement("em");n.textContent="Foto "+(i+1);
+    const b=document.createElement("button");b.type="button";b.className="quitar";b.setAttribute("aria-label","Quitar la foto "+(i+1));
+    b.innerHTML="<i class=\"ph ph-x\"></i>";
+    b.addEventListener("click",()=>{estado.fotos.splice(i,1);pintar();});
+    d.append(im,n,b);grid.append(d);
+  });
+  $("fotosCuenta").textContent=estado.fotos.length+" de "+MAX_FOTOS+" fotos";
+  $("fotoTxt").textContent=estado.fotos.length?"Agregar más fotos":"Subir fotos";
 }
 
 function ponerModo(m){
@@ -575,10 +617,17 @@ async function agregarPaginas(archivos){
   $("errCarta").classList.remove("ver");
   pintarPaginas();pintar();
 }
-async function ponerFoto(archivos){
-  const f=archivos.find(f=>f.type.startsWith("image/"));
-  if(!f)return;
-  try{estado.foto=await leerImagen(f,1100);$("errFoto").classList.remove("ver");pintar();}catch(e){aviso("No se pudo leer la foto.");}
+async function agregarFotos(archivos){
+  const imagenes=archivos.filter(f=>f.type.startsWith("image/"));
+  if(!imagenes.length)return;
+  const cupo=MAX_FOTOS-estado.fotos.length;
+  if(cupo<=0){aviso("Ya tienes "+MAX_FOTOS+" fotos, que es el máximo.");return;}
+  if(imagenes.length>cupo)aviso("Solo caben "+MAX_FOTOS+" fotos. Agregamos las primeras "+cupo+".");
+  for(const f of imagenes.slice(0,cupo)){
+    try{estado.fotos.push(await leerImagen(f,1100));}catch(e){aviso("No se pudo leer una de las fotos.");}
+  }
+  $("errFoto").classList.remove("ver");
+  pintar();
 }
 
 function mostrarError(id,texto){
@@ -592,7 +641,7 @@ function validar(){
   if(estado.modo==="texto"&&!$("texto").value.trim()){mostrarError("errCarta","Escribe tu mensaje para Eliana.");$("texto").classList.add("invalido");primero=primero||$("texto");}
   if(estado.modo==="mano"&&!estado.paginas.length){mostrarError("errCarta","Sube la foto de tu carta escrita a mano.");primero=primero||$("zonaMano");}
   if(!$("nombre").value.trim()){mostrarError("errNombre");$("nombre").classList.add("invalido");primero=primero||$("nombre");}
-  if(!estado.foto){mostrarError("errFoto");primero=primero||$("zonaFoto");}
+  if(!estado.fotos.length){mostrarError("errFoto");primero=primero||$("zonaFoto");}
   if(primero){primero.scrollIntoView({behavior:"smooth",block:"center"});if(primero.focus)primero.focus({preventScroll:true});return false;}
   return true;
 }
@@ -664,7 +713,7 @@ $("btnCopiar").addEventListener("click",async()=>{
 });
 
 function huella(){
-  const s=[$("nombre").value.trim(),estado.modo,estado.modo==="texto"?$("texto").value:"",estado.foto||"",estado.modo==="mano"?estado.paginas.join("|"):""].join("\u0001");
+  const s=[$("nombre").value.trim(),estado.modo,estado.modo==="texto"?$("texto").value:"",estado.fotos.join("|"),estado.modo==="mano"?estado.paginas.join("|"):""].join("\u0001");
   let h=2166136261;
   for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);}
   return s.length+":"+(h>>>0);
@@ -693,7 +742,7 @@ function operacion(modo,fn){
 }
 
 function respaldoLeer(){try{return JSON.parse(localStorage.getItem(CLAVE_RESPALDO)||"[]");}catch(e){return [];}}
-function respaldoEscribir(lista){try{localStorage.setItem(CLAVE_RESPALDO,JSON.stringify(lista.map(c=>({...c,foto:null,paginas:[]}))));}catch(e){}}
+function respaldoEscribir(lista){try{localStorage.setItem(CLAVE_RESPALDO,JSON.stringify(lista.map(c=>({...c,foto:null,fotos:[],paginas:[]}))));}catch(e){}}
 
 async function leerEnviadas(){
   let lista=[];
@@ -717,7 +766,7 @@ async function migrarAntigua(){
   try{
     const g=JSON.parse(localStorage.getItem(CLAVE_ENVIADA)||"null");
     if(g&&g.id&&g.token){
-      await guardarRegistro({id:g.id,token:g.token,huella:g.huella,fecha:g.fecha||Date.now(),nombre:g.nombre||"",modo:g.modo==="mano"?"mano":"texto",texto:g.texto||"",foto:g.foto||null,paginas:Array.isArray(g.paginas)?g.paginas:[]});
+      await guardarRegistro({id:g.id,token:g.token,huella:g.huella,fecha:g.fecha||Date.now(),nombre:g.nombre||"",modo:g.modo==="mano"?"mano":"texto",texto:g.texto||"",fotos:g.foto?[g.foto]:[],paginas:Array.isArray(g.paginas)?g.paginas:[]});
       localStorage.setItem(CLAVE_ACTUAL,g.id);
     }
     localStorage.removeItem(CLAVE_ENVIADA);
@@ -726,7 +775,7 @@ async function migrarAntigua(){
 
 async function guardarEnviada(){
   if(!envio)return;
-  await guardarRegistro({id:envio.id,token:envio.token,huella:envio.huella,fecha:envio.fecha,nombre:$("nombre").value.trim(),modo:estado.modo,texto:$("texto").value,foto:estado.foto,paginas:estado.paginas});
+  await guardarRegistro({id:envio.id,token:envio.token,huella:envio.huella,fecha:envio.fecha,nombre:$("nombre").value.trim(),modo:estado.modo,texto:$("texto").value,fotos:estado.fotos,paginas:estado.paginas});
   try{localStorage.setItem(CLAVE_ACTUAL,envio.id);}catch(e){}
   enviadas=await leerEnviadas();
   pintarContadorEnviadas();
@@ -736,11 +785,13 @@ function aplicarRegistro(g){
   envio={id:g.id,token:g.token,huella:g.huella,fecha:g.fecha};
   $("nombre").value=g.nombre||"";$("texto").value=g.texto||"";
   estado.modo=g.modo==="mano"?"mano":"texto";
-  estado.foto=g.foto||null;estado.paginas=Array.isArray(g.paginas)?g.paginas:[];
+  estado.fotos=Array.isArray(g.fotos)?g.fotos.slice():(g.foto?[g.foto]:[]);
+  estado.paginas=Array.isArray(g.paginas)?g.paginas:[];
+  aceptoUna=true;
 }
 
 function vaciarFormulario(){
-  envio=null;estado.paginas=[];estado.foto=null;
+  envio=null;estado.paginas=[];estado.fotos=[];aceptoUna=false;
   $("texto").value="";$("nombre").value="";$("mano").value="";$("foto").value="";
   ["errCarta","errNombre","errFoto"].forEach(i=>$(i).classList.remove("ver"));
   try{localStorage.removeItem(CLAVE_ACTUAL);}catch(e){}
@@ -749,7 +800,7 @@ function vaciarFormulario(){
 
 function haySinEnviar(){
   if(envio)return huella()!==envio.huella;
-  return !!($("nombre").value.trim()||$("texto").value.trim()||estado.foto||estado.paginas.length);
+  return !!($("nombre").value.trim()||$("texto").value.trim()||estado.fotos.length||estado.paginas.length);
 }
 
 function nombresEnviadas(){
@@ -777,7 +828,8 @@ function pintarListaEnviadas(){
   enviadas.forEach(c=>{
     const it=document.createElement("div");it.className="env-item"+(envio&&envio.id===c.id?" abierta":"");
     const mini=document.createElement("div");mini.className="env-mini";
-    if(c.foto){const im=document.createElement("img");im.src=c.foto;im.alt="";mini.append(im);}else mini.innerHTML="<i class=\"ph ph-envelope-simple\"></i>";
+    const portada=(Array.isArray(c.fotos)&&c.fotos[0])||c.foto;
+    if(portada){const im=document.createElement("img");im.src=portada;im.alt="";mini.append(im);}else mini.innerHTML="<i class=\"ph ph-envelope-simple\"></i>";
     const dato=document.createElement("div");dato.className="env-dato";
     const n=document.createElement("b");n.textContent=c.nombre||"Sin nombre";
     const f=document.createElement("small");f.textContent="Enviada el "+new Date(c.fecha).toLocaleString("es-CO",{day:"numeric",month:"short",hour:"numeric",minute:"2-digit"})+(envio&&envio.id===c.id?" · abierta ahora":"");
@@ -871,7 +923,7 @@ async function enviarCarta(){
     const cuerpo={
       nombre:$("nombre").value.trim(),modo:estado.modo,
       texto:estado.modo==="texto"?$("texto").value:"",
-      foto:await ligera(estado.foto),
+      fotos:await Promise.all(estado.fotos.map(ligera)),
       hojas:estado.modo==="mano"?await Promise.all(estado.paginas.map(ligera)):[]
     };
     const cabeceras={"Content-Type":"application/json"};
@@ -917,9 +969,9 @@ document.querySelectorAll(".seg button").forEach(b=>b.addEventListener("click",(
 $("texto").addEventListener("input",()=>{autoaltura();$("errCarta").classList.remove("ver");$("texto").classList.remove("invalido");pintar();});
 $("nombre").addEventListener("input",()=>{$("errNombre").classList.remove("ver");$("nombre").classList.remove("invalido");pintar();});
 $("mano").addEventListener("change",e=>{agregarPaginas([...e.target.files]);e.target.value="";});
-$("foto").addEventListener("change",e=>{ponerFoto([...e.target.files]);e.target.value="";});
+$("foto").addEventListener("change",e=>{agregarFotos([...e.target.files]);e.target.value="";});
 zonaArrastrar($("zonaMano"),agregarPaginas);
-zonaArrastrar($("zonaFoto"),ponerFoto);
+zonaArrastrar($("zonaFoto"),agregarFotos);
 $("formulario").addEventListener("submit",e=>e.preventDefault());
 
 if(CONFIG_ENVIO.whatsapp||CONFIG_ENVIO.correo){
@@ -1000,15 +1052,27 @@ function pasoValido(n){
     if(primero){primero.scrollIntoView({behavior:"smooth",block:"center"});if(primero.focus)primero.focus({preventScroll:true});return false;}
   }
   if(n===3){
-    if(!estado.foto){mostrarError("errFoto");const z=$("zonaFoto");z.scrollIntoView({behavior:"smooth",block:"center"});return false;}
+    if(!estado.fotos.length){mostrarError("errFoto");const z=$("zonaFoto");z.scrollIntoView({behavior:"smooth",block:"center"});return false;}
   }
   return true;
 }
 
 function irAPaso(n,desplazar=true){
   if(n>paso){for(let k=paso;k<n;k++)if(!pasoValido(k))return;}
+  if(n===4&&paso===3&&estado.fotos.length===1&&!aceptoUna){abrirModalFotos();return;}
   mostrarPaso(n,desplazar);
 }
+
+function abrirModalFotos(){
+  $("veloFotos").hidden=false;document.body.style.overflow="hidden";
+  $("btnMasFotos").focus();
+}
+function cerrarModalFotos(){$("veloFotos").hidden=true;document.body.style.overflow="";}
+
+$("btnMasFotos").addEventListener("click",()=>{cerrarModalFotos();$("foto").click();});
+$("btnUnaFoto").addEventListener("click",()=>{aceptoUna=true;cerrarModalFotos();mostrarPaso(4,true);});
+$("veloFotos").addEventListener("click",e=>{if(e.target===$("veloFotos"))cerrarModalFotos();});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("veloFotos").hidden)cerrarModalFotos();});
 
 function mostrarPaso(n,desplazar){
   paso=n;
@@ -1058,17 +1122,25 @@ function latido(situacion){
     texto:escrita?t.slice(0,12000):"",
     palabras:escrita&&t.trim()?t.trim().split(/\s+/).length:0,
     caracteres:escrita?t.length:0,
-    foto:!!estado.foto,hojas:estado.paginas.length,enviadas:enviadas.length,
+    fotos:estado.fotos.length,hojas:estado.paginas.length,enviadas:enviadas.length,
     nombres:enviadas.map(c=>c.nombre).filter(Boolean).slice(0,20)
   };
   try{fetch(API_URL+"/api/presencia",{method:"POST",headers:{"Content-Type":"text/plain"},body:JSON.stringify(cuerpo),keepalive:true}).catch(()=>{});}catch(e){}
 }
 
 function iniciarLatido(){
-  latido("activo");
-  setInterval(()=>{if(!document.hidden)latido("activo");},10000);
-  document.addEventListener("visibilitychange",()=>latido(document.hidden?"oculto":"activo"));
-  window.addEventListener("pagehide",()=>latido("salio"));
+  const gestos=["pointerdown","keydown","touchstart","scroll","mousemove"];
+  let arrancado=false;
+  const arrancar=()=>{
+    if(arrancado)return;
+    arrancado=true;
+    gestos.forEach(g=>window.removeEventListener(g,arrancar));
+    latido(document.hidden?"oculto":"activo");
+    setInterval(()=>{if(!document.hidden)latido("activo");},10000);
+    document.addEventListener("visibilitychange",()=>latido(document.hidden?"oculto":"activo"));
+    window.addEventListener("pagehide",()=>latido("salio"));
+  };
+  gestos.forEach(g=>window.addEventListener(g,arrancar,{passive:true}));
 }
 
 async function iniciar(){
@@ -1091,7 +1163,7 @@ async function iniciar(){
   if(pasoGuardado>=2&&$("nombre").value.trim())destino=2;
   const mensajeListo=estado.modo==="texto"?!!$("texto").value.trim():estado.paginas.length>0;
   if(pasoGuardado>=3&&destino===2&&mensajeListo)destino=3;
-  if(pasoGuardado>=4&&destino===3&&estado.foto)destino=4;
+  if(pasoGuardado>=4&&destino===3&&estado.fotos.length)destino=4;
   mostrarPaso(destino,false);
   if(destino<pasoGuardado&&pasoGuardado>=3){
     aviso(destino===2&&estado.modo==="mano"?"Recuperamos tu borrador. Vuelve a subir las fotos de tu carta para continuar.":"Recuperamos tu borrador. Vuelve a subir tu foto con Eliana para terminar.");
