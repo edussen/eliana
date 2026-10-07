@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Cartas para Eliana · Administración</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Red+Hat+Display:wght@400;500;700;800&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
+<style>
+  :root{
+    --marca:#c8000d;--marca-oscuro:#9d000a;--marca-suave:#fdecee;
+    --texto:#1c1f23;--texto-suave:#5b6470;--texto-tenue:#8b94a0;
+    --fondo:#f3f4f8;--superficie:#fff;--borde:#e3e6ec;--oro-suave:#fff3cf;--error:#c62828;
+    --r-md:14px;--r-lg:20px;--sombra:0 6px 22px rgba(20,30,50,.08);
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;font-family:'Red Hat Display',system-ui,sans-serif;color:var(--texto);background:var(--fondo);line-height:1.5}
+  button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;padding:0}
+  [hidden]{display:none!important}
+
+  .acceso{min-height:100vh;display:grid;place-items:center;padding:24px 16px}
+  .acceso-caja{width:100%;max-width:400px;background:var(--superficie);border-radius:var(--r-lg);padding:30px 26px;box-shadow:var(--sombra);text-align:center}
+  .acceso-caja .ico{display:inline-grid;place-items:center;width:56px;height:56px;border-radius:16px;background:var(--marca-suave);color:var(--marca);font-size:1.8rem;margin-bottom:12px}
+  .acceso-caja h1{margin:0 0 4px;font-size:1.4rem;font-weight:800;letter-spacing:-.02em}
+  .acceso-caja p{margin:0 0 20px;font-size:.92rem;color:var(--texto-suave)}
+  input[type=password],input[type=search],input[type=text]{width:100%;padding:13px 15px;border:1.5px solid var(--borde);border-radius:12px;background:#fff;font:inherit;font-size:1rem}
+  input:focus{outline:none;border-color:var(--marca);box-shadow:0 0 0 4px rgba(200,0,13,.1)}
+  .recordar{display:flex;align-items:center;gap:8px;margin:12px 0 16px;font-size:.86rem;color:var(--texto-suave);text-align:left}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 18px;border-radius:12px;font-weight:700;font-size:.93rem;border:1.5px solid var(--borde);background:#fff;transition:background .15s ease}
+  .btn:hover{background:#f6f7fa}
+  .btn.principal{background:var(--marca);border-color:var(--marca);color:#fff}
+  .btn.principal:hover{background:var(--marca-oscuro)}
+  .btn:disabled{opacity:.6;cursor:progress}
+  .btn:focus-visible,.tarjeta:focus-visible{outline:3px solid #3b82f6;outline-offset:2px}
+  .acceso-caja .btn{width:100%}
+  .error{margin-top:12px;font-size:.88rem;font-weight:700;color:var(--error)}
+
+  .barra{position:sticky;top:0;z-index:10;background:var(--marca);color:#fff;box-shadow:0 2px 10px rgba(0,0,0,.18)}
+  .barra-in{max-width:1100px;margin:0 auto;padding:14px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .barra h1{margin:0;font-size:1.15rem;font-weight:800;letter-spacing:-.01em;flex:1;min-width:180px}
+  .barra h1 small{display:block;font-size:.78rem;font-weight:500;opacity:.85}
+  .barra .btn{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.28);color:#fff;padding:9px 14px}
+  .barra .btn:hover{background:rgba(255,255,255,.24)}
+  .pestanas{max-width:1100px;margin:0 auto;padding:0 16px;display:flex;gap:4px}
+  .pestana{display:inline-flex;align-items:center;gap:8px;padding:10px 18px;border-radius:12px 12px 0 0;font-weight:700;font-size:.92rem;color:rgba(255,255,255,.8);transition:background .15s ease}
+  .pestana:hover{background:rgba(255,255,255,.12)}
+  .pestana.on{background:var(--fondo);color:var(--marca-oscuro)}
+  .pestana .num{min-width:22px;padding:1px 7px;border-radius:999px;background:#22c55e;color:#fff;font-size:.75rem;font-weight:800;text-align:center}
+  .pestana .num.cero{background:rgba(255,255,255,.3)}
+  .pestana.on .num.cero{background:#c7cbd3}
+  .barra{padding-bottom:0}
+  .barra-in{padding-bottom:10px}
+  main{max-width:1100px;margin:0 auto;padding:20px 16px 60px}
+
+  .resumen-vivo{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px}
+  .dato-vivo{display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:12px;background:#fff;box-shadow:var(--sombra);font-size:.86rem;color:var(--texto-suave)}
+  .dato-vivo b{font-size:1.2rem;font-weight:800;color:var(--texto)}
+  .dato-vivo.boton{cursor:pointer;border:1.5px dashed var(--borde)}
+  .dato-vivo.boton:hover{border-color:var(--marca)}
+  .dato-vivo.boton:focus-visible{outline:3px solid #3b82f6;outline-offset:2px}
+  .sub-vivo{display:flex;align-items:center;gap:8px;margin:26px 0 12px;font-size:.95rem;font-weight:800;color:var(--texto-suave)}
+  #listaSalieron .disp{opacity:.8}
+  .lista-vivo{display:flex;flex-direction:column;gap:10px}
+  .disp{background:var(--superficie);border-radius:var(--r-md);box-shadow:var(--sombra);border-left:5px solid #c7cbd3;overflow:hidden}
+  .disp.linea{border-left-color:#22c55e}
+  .disp.oculto{border-left-color:#f59e0b}
+  .disp-cab{width:100%;display:flex;align-items:center;gap:14px;padding:14px 16px;text-align:left}
+  .disp-cab:focus-visible{outline:3px solid #3b82f6;outline-offset:-3px}
+  .punto{flex:none;width:12px;height:12px;border-radius:50%;background:#c7cbd3}
+  .linea .punto{background:#22c55e;box-shadow:0 0 0 4px rgba(34,197,94,.2);animation:pulso 2s ease-in-out infinite}
+  .oculto .punto{background:#f59e0b}
+  @keyframes pulso{50%{box-shadow:0 0 0 8px rgba(34,197,94,0)}}
+  .disp-info{flex:1;min-width:0}
+  .disp-nombre{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-weight:800;font-size:1.02rem}
+  .disp-nombre .sin{font-weight:500;color:var(--texto-tenue)}
+  .estado{padding:2px 9px;border-radius:999px;font-size:.72rem;font-weight:800;background:#eceef3;color:var(--texto-suave)}
+  .linea .estado{background:#dcfce7;color:#166534}
+  .oculto .estado{background:#fef3c7;color:#92400e}
+  .disp-sub{margin-top:3px;font-size:.8rem;color:var(--texto-suave);display:flex;flex-wrap:wrap;gap:4px 14px}
+  .disp-sub span{display:inline-flex;align-items:center;gap:5px}
+  .disp-aviso{display:flex;align-items:flex-start;gap:7px;margin-top:6px;padding:6px 10px;border-radius:8px;background:#eff6ff;color:#1e3a8a;font-size:.82rem;font-weight:700;overflow-wrap:anywhere}
+  .disp-aviso .ph{flex:none;font-size:1.05rem;margin-top:1px}
+  .progreso{flex:none;display:flex;gap:4px;width:92px}
+  .progreso i{flex:1;height:6px;border-radius:3px;background:#e3e6ec}
+  .progreso i.ok{background:var(--marca)}
+  .disp-cuerpo{padding:0 16px 16px 42px;font-size:.88rem}
+  .disp-stats{display:flex;flex-wrap:wrap;gap:6px 18px;margin-bottom:10px;color:var(--texto-suave);font-size:.82rem}
+  .disp-borrador{padding:14px 16px;border-radius:12px;background:#fffdf7;border:1px solid #f1ead8;font-family:'Caveat',cursive;font-size:1.35rem;line-height:1.45;white-space:pre-wrap;overflow-wrap:anywhere;max-height:320px;overflow-y:auto}
+  .disp-borrador.vacio{font-family:'Red Hat Display',sans-serif;font-size:.86rem;color:var(--texto-tenue)}
+  @media(max-width:560px){.progreso{display:none}.disp-cuerpo{padding-left:16px}}
+  .filtros{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+  .filtros input{flex:1;min-width:220px}
+  .chips{display:flex;gap:6px}
+  .chip{padding:10px 14px;border-radius:999px;font-size:.86rem;font-weight:700;background:#fff;border:1.5px solid var(--borde);color:var(--texto-suave)}
+  .chip.on{background:var(--marca);border-color:var(--marca);color:#fff}
+  .vacio{padding:60px 16px;text-align:center;color:var(--texto-tenue)}
+  .vacio .ph{font-size:2.6rem;display:block;margin-bottom:8px}
+
+  .rejilla{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
+  .tarjeta{display:flex;flex-direction:column;text-align:left;background:var(--superficie);border-radius:var(--r-md);overflow:hidden;box-shadow:var(--sombra);transition:transform .15s ease}
+  .tarjeta:hover{transform:translateY(-3px)}
+  .miniatura{position:relative;aspect-ratio:4/3;background:#eceef3;display:grid;place-items:center;color:var(--texto-tenue);font-size:2.4rem;overflow:hidden}
+  .miniatura img{width:100%;height:100%;object-fit:cover;display:block}
+  .insignia.der{left:auto;right:10px;background:#b45309}
+  .hist{margin-top:26px}
+  .hist h3{display:flex;align-items:center;gap:8px;margin:0 0 12px;font-size:1.05rem;font-weight:800}
+  .hist h3 .ph{font-size:1.3rem;color:var(--marca)}
+  .edicion{background:#fff;border-radius:14px;padding:16px;margin-bottom:12px;box-shadow:var(--sombra)}
+  .edicion-cab{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap}
+  .edicion-cab b{font-size:1rem;font-weight:800}
+  .edicion-cab span{font-size:.8rem;color:var(--texto-tenue)}
+  .edicion-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+  .edicion-chips span{padding:3px 10px;border-radius:999px;background:#fef3c7;color:#92400e;font-size:.74rem;font-weight:800}
+  .cambio{margin-top:14px}
+  .cambio-tit{margin-bottom:6px;font-size:.72rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--texto-tenue)}
+  .antes-ahora{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .col{padding:10px 12px;border-radius:10px;font-size:.92rem;overflow-wrap:anywhere}
+  .col small{display:block;margin-bottom:4px;font-size:.7rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+  .col.antes{background:#fff5f5;border:1px solid #f5c2c2}
+  .col.antes small{color:#b91c1c}
+  .col.ahora{background:#f0fdf4;border:1px solid #bbf7d0}
+  .col.ahora small{color:#15803d}
+  .diff{padding:12px 14px;border-radius:10px;border:1px solid var(--borde);background:#fafafa;font-size:.95rem;line-height:1.65;white-space:pre-wrap;overflow-wrap:anywhere}
+  .diff del{background:#fee2e2;color:#991b1b;text-decoration:line-through}
+  .diff ins{background:#dcfce7;color:#166534;text-decoration:none}
+  .leyenda{margin-top:6px;font-size:.76rem;color:var(--texto-tenue)}
+  .leyenda del{background:#fee2e2;color:#991b1b;padding:0 5px;border-radius:3px}
+  .leyenda ins{background:#dcfce7;color:#166534;text-decoration:none;padding:0 5px;border-radius:3px}
+  .minis{display:flex;flex-wrap:wrap;gap:8px}
+  .minis img{width:84px;height:84px;object-fit:cover;border-radius:8px;border:1px solid var(--borde);cursor:zoom-in;background:#eceef3}
+  .minis .sin{font-size:.84rem;color:var(--texto-tenue)}
+  details.anterior{margin-top:14px;border-top:1px dashed var(--borde);padding-top:10px}
+  details.anterior summary{cursor:pointer;font-size:.86rem;font-weight:700;color:var(--marca-oscuro)}
+  .anterior-cuerpo{margin-top:10px;padding:14px;border-radius:10px;background:#fffdf7;border:1px solid #f1ead8}
+  .anterior-cuerpo .nom{font-weight:800;margin-bottom:6px}
+  .anterior-cuerpo pre{margin:0 0 10px;font-family:'Caveat',cursive;font-size:1.3rem;line-height:1.45;white-space:pre-wrap;overflow-wrap:anywhere}
+  @media(max-width:560px){.antes-ahora{grid-template-columns:1fr}}
+  .insignia{position:absolute;left:10px;top:10px;padding:3px 10px;border-radius:999px;background:rgba(0,0,0,.6);color:#fff;font-size:.72rem;font-weight:700}
+  .tarjeta-cuerpo{padding:14px 16px 16px}
+  .tarjeta-cuerpo b{display:block;font-size:1.05rem;font-weight:800;overflow-wrap:anywhere}
+  .tarjeta-cuerpo time{display:block;font-size:.78rem;color:var(--texto-tenue);margin:2px 0 8px}
+  .tarjeta-cuerpo p{margin:0;font-size:.88rem;color:var(--texto-suave);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
+
+  .velo{position:fixed;inset:0;z-index:50;background:rgba(18,20,26,.62);display:flex;justify-content:center;align-items:flex-start;overflow-y:auto;padding:24px 14px}
+  .panel{position:relative;width:100%;max-width:700px;background:var(--fondo);border-radius:var(--r-lg);padding:18px 18px 22px}
+  .panel-cab{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+  .panel-cab .espacio{flex:1}
+  .cerrar{width:40px;height:40px;border-radius:50%;background:#fff;border:1.5px solid var(--borde);display:grid;place-items:center;font-size:1.2rem}
+  .meta{margin:0 0 14px;font-size:.85rem;color:var(--texto-suave)}
+  .aviso-sin{display:flex;align-items:center;gap:8px;margin:0 0 14px;padding:10px 14px;border-radius:12px;background:var(--oro-suave);font-size:.86rem;color:#5c4a1c}
+
+  .carta{position:relative;padding:30px 30px 26px;background:#fffdf7;border-radius:8px;box-shadow:0 12px 34px rgba(60,40,10,.14);border:1px solid #f1ead8;overflow:hidden}
+  .carta::before{content:"";position:absolute;left:0;top:0;bottom:0;width:7px;background:linear-gradient(var(--marca),#e8141f)}
+  .carta-cab{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:16px;padding-bottom:12px;border-bottom:1.5px dashed #e8dfc6}
+  .carta-cab .para{font-family:'Caveat',cursive;font-weight:700;font-size:2rem;line-height:1;color:var(--marca-oscuro)}
+  .carta-cab .fecha{font-size:.78rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#a58a4a}
+  .carta-texto{font-family:'Caveat',cursive;font-weight:500;font-size:1.55rem;line-height:1.5;color:#2c2a26;white-space:pre-wrap;overflow-wrap:anywhere}
+  .hojas{display:flex;flex-direction:column;gap:12px}
+  .hojas img{width:100%;display:block;border-radius:4px;border:1px solid #eadfc2;background:#fff;cursor:zoom-in}
+  .firma{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;margin-top:24px}
+  .firma .con{font-family:'Caveat',cursive;font-size:1.5rem;color:#6d5f3a}
+  .firma .quien{font-family:'Caveat',cursive;font-weight:700;font-size:2.3rem;line-height:1.05;color:var(--marca-oscuro);overflow-wrap:anywhere}
+  .polaroid{flex:none;width:150px;padding:8px 8px 10px;background:#fff;border-radius:3px;box-shadow:0 6px 18px rgba(0,0,0,.2);transform:rotate(3deg)}
+  .polaroid .marco{aspect-ratio:4/5;background:#f3f1ea;overflow:hidden;display:grid;place-items:center;color:#c4bda9;font-size:2rem}
+  .polaroid .marco img{width:100%;height:100%;object-fit:cover;display:block;cursor:zoom-in}
+  .polaroid small{display:block;margin-top:7px;text-align:center;font-family:'Caveat',cursive;font-size:1.05rem;color:#6d5f3a;line-height:1.1}
+
+  .aviso{position:fixed;left:50%;bottom:24px;z-index:90;max-width:min(92vw,460px);transform:translate(-50%,30px);opacity:0;pointer-events:none;padding:12px 18px;border-radius:14px;background:#1c1f23;color:#fff;font-size:.9rem;font-weight:600;transition:all .25s ease}
+  .aviso.ver{transform:translate(-50%,0);opacity:1}
+  @media(max-width:560px){
+    .carta{padding:24px 20px 22px}
+    .carta-texto{font-size:1.4rem}
+    .firma{flex-direction:column-reverse;align-items:flex-start}
+  }
+</style>
+</head>
+<body>
+
+<section class="acceso" id="acceso">
+  <form class="acceso-caja" id="formAcceso">
+    <span class="ico"><i class="ph ph-lock-key" aria-hidden="true"></i></span>
+    <h1>Cartas para Eliana</h1>
+    <p>Escribe tu clave de administrador para ver las cartas que han enviado.</p>
+    <label for="clave" hidden>Clave</label>
+    <input type="password" id="clave" placeholder="Clave de administrador" autocomplete="current-password" required>
+    <label class="recordar"><input type="checkbox" id="recordar"> Recordar en este navegador</label>
+    <button type="submit" class="btn principal" id="btnEntrar"><i class="ph ph-sign-in" aria-hidden="true"></i><span>Entrar</span></button>
+    <div class="error" id="errAcceso" role="alert" hidden></div>
+  </form>
+</section>
+
+<div id="app" hidden>
+  <header class="barra">
+    <div class="barra-in">
+      <h1>Cartas para Eliana<small id="resumen">Cargando…</small></h1>
+      <button type="button" class="btn" id="btnActualizar"><i class="ph ph-arrow-clockwise" aria-hidden="true"></i>Actualizar</button>
+      <button type="button" class="btn" id="btnSalir"><i class="ph ph-sign-out" aria-hidden="true"></i>Salir</button>
+    </div>
+    <nav class="pestanas" aria-label="Secciones">
+      <button type="button" class="pestana on" data-v="cartas"><i class="ph ph-envelope-simple" aria-hidden="true"></i>Cartas</button>
+      <button type="button" class="pestana" data-v="vivo"><i class="ph ph-broadcast" aria-hidden="true"></i>En vivo<span class="num cero" id="numVivo">0</span></button>
+    </nav>
+  </header>
+  <main>
+    <section id="vistaVivo" hidden>
+      <div class="resumen-vivo" id="resumenVivo"></div>
+      <div class="lista-vivo" id="listaVivo"></div>
+      <div class="vacio" id="vacioVivo" hidden><i class="ph ph-broadcast" aria-hidden="true"></i><span id="vacioVivoTxt">Todavía no se ha conectado nadie.</span></div>
+      <div id="salieron" hidden>
+        <h3 class="sub-vivo"><i class="ph ph-sign-out" aria-hidden="true"></i>Ya salieron</h3>
+        <div class="lista-vivo" id="listaSalieron"></div>
+      </div>
+    </section>
+    <section id="vistaCartas">
+    <div class="filtros">
+      <input type="search" id="buscar" placeholder="Buscar por nombre o por texto…" aria-label="Buscar cartas">
+      <div class="chips" role="group" aria-label="Filtrar por tipo">
+        <button type="button" class="chip on" data-f="todas">Todas</button>
+        <button type="button" class="chip" data-f="texto">Escritas</button>
+        <button type="button" class="chip" data-f="mano">A mano</button>
+      </div>
+    </div>
+    <div class="rejilla" id="rejilla"></div>
+    <div class="vacio" id="vacio" hidden><i class="ph ph-envelope-simple" aria-hidden="true"></i><span id="vacioTxt">Todavía no ha llegado ninguna carta.</span></div>
+    </section>
+  </main>
+</div>
+
+<div class="velo" id="velo" hidden>
+  <div class="panel" role="dialog" aria-modal="true" aria-label="Carta">
+    <div class="panel-cab">
+      <button type="button" class="btn principal" id="btnPng"><i class="ph ph-download-simple" aria-hidden="true"></i><span>Descargar carta</span></button>
+      <button type="button" class="btn" id="btnFoto"><i class="ph ph-image" aria-hidden="true"></i>Foto</button>
+      <button type="button" class="btn" id="btnTexto"><i class="ph ph-copy" aria-hidden="true"></i>Copiar texto</button>
+      <span class="espacio"></span>
+      <button type="button" class="cerrar" id="btnCerrar" aria-label="Cerrar"><i class="ph ph-x" aria-hidden="true"></i></button>
+    </div>
+    <p class="meta" id="meta"></p>
+    <div class="aviso-sin" id="avisoSin" hidden><i class="ph ph-warning" aria-hidden="true"></i><span>Esta carta no tiene la foto guardada. Si la persona la vuelve a enviar desde su dispositivo, aparecerá completa.</span></div>
+    <article class="carta" id="carta">
+      <div class="carta-cab"><span class="para">Para Eliana</span><span class="fecha">8 oct 2026</span></div>
+      <div id="cuerpo"></div>
+      <div class="firma">
+        <div><div class="con">Con cariño,</div><div class="quien" id="quien"></div></div>
+        <div class="polaroid"><div class="marco" id="marco"><i class="ph ph-camera" aria-hidden="true"></i></div><small id="pie"></small></div>
+      </div>
+    </article>
+    <section class="hist" id="hist" hidden>
+      <h3><i class="ph ph-clock-counter-clockwise" aria-hidden="true"></i>Historial de cambios</h3>
+      <div id="histLista"></div>
+    </section>
+  </div>
+</div>
+
+<div class="aviso" id="aviso" role="status" aria-live="polite"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script>
+const API_URL="https://cartas-eliana.mrluki4656.workers.dev";
+const CLAVE_GUARDADA="cartas-eliana-admin";
+const $=id=>document.getElementById(id);
+
+let clave="",cartas=[],filtro="todas",abierta=null;
+const cacheImg=new Map(),pendientes=new Map();
+
+function aviso(t){
+  const a=$("aviso");a.textContent=t;a.classList.add("ver");
+  clearTimeout(aviso.t);aviso.t=setTimeout(()=>a.classList.remove("ver"),2800);
+}
+
+function fecha(ms){
+  return new Date(ms).toLocaleString("es-CO",{day:"numeric",month:"short",year:"numeric",hour:"numeric",minute:"2-digit"});
+}
+
+async function api(ruta){
+  const r=await fetch(API_URL+ruta,{headers:{Authorization:"Bearer "+clave}});
+  if(r.status===401){const e=new Error("clave");e.codigo=401;throw e;}
+  if(!r.ok)throw new Error("http "+r.status);
+  return r;
+}
+
+function imagen(id){
+  if(cacheImg.has(id))return Promise.resolve(cacheImg.get(id));
+  if(pendientes.has(id))return pendientes.get(id);
+  const p=api("/api/imagenes/"+id).then(r=>r.blob()).then(b=>{const u=URL.createObjectURL(b);cacheImg.set(id,u);pendientes.delete(id);return u;}).catch(e=>{pendientes.delete(id);throw e;});
+  pendientes.set(id,p);
+  return p;
+}
+
+function limpiar(){
+  detenerSondeo();
+  clave="";cartas=[];cacheImg.forEach(u=>URL.revokeObjectURL(u));cacheImg.clear();
+  $("rejilla").innerHTML="";
+}
+
+function mostrarAcceso(mensaje){
+  $("app").hidden=true;$("acceso").hidden=false;$("velo").hidden=true;
+  const e=$("errAcceso");e.hidden=!mensaje;e.textContent=mensaje||"";
+}
+
+async function cargar(){
+  $("resumen").textContent="Cargando…";
+  try{
+    const datos=await (await api("/api/cartas")).json();
+    cartas=datos.cartas||[];
+    $("acceso").hidden=true;$("app").hidden=false;
+    pintarLista();
+    if(!sondeo)iniciarSondeo();
+  }catch(e){
+    if(e.codigo===401){try{localStorage.removeItem(CLAVE_GUARDADA);}catch(x){}limpiar();mostrarAcceso("La clave no es correcta.");return;}
+    if($("app").hidden){mostrarAcceso("No se pudo conectar. Revisa tu conexión e intenta de nuevo.");}
+    else{$("resumen").textContent="No se pudo actualizar";aviso("No se pudo conectar.");}
+  }
+}
+
+function visibles(){
+  const q=$("buscar").value.trim().toLowerCase();
+  return cartas.filter(c=>(filtro==="todas"||c.modo===filtro)&&(!q||c.nombre.toLowerCase().includes(q)||(c.texto||"").toLowerCase().includes(q)));
+}
+
+function pintarLista(){
+  const lista=visibles(),caja=$("rejilla");
+  caja.innerHTML="";
+  const esc=cartas.filter(c=>c.modo==="texto").length,man=cartas.length-esc;
+  $("resumen").textContent=cartas.length?cartas.length+(cartas.length===1?" carta":" cartas")+" · "+esc+" escritas · "+man+" a mano":"Sin cartas todavía";
+  $("vacio").hidden=lista.length>0;
+  $("vacioTxt").textContent=cartas.length?"No hay cartas que coincidan con tu búsqueda.":"Todavía no ha llegado ninguna carta.";
+  const obs="IntersectionObserver" in window?new IntersectionObserver(es=>es.forEach(en=>{
+    if(!en.isIntersecting)return;obs.unobserve(en.target);ponerMiniatura(en.target);
+  }),{rootMargin:"200px"}):null;
+  lista.forEach(c=>{
+    const b=document.createElement("button");b.type="button";b.className="tarjeta";
+    const mini=document.createElement("div");mini.className="miniatura";mini.dataset.foto=c.foto_id||"";
+    mini.innerHTML="<i class=\"ph ph-camera\"></i>";
+    const ins=document.createElement("span");ins.className="insignia";ins.textContent=c.modo==="mano"?"A mano · "+c.hojas+(c.hojas===1?" hoja":" hojas"):"Escrita";
+    mini.append(ins);
+    const ed=c.ediciones||0,editada=ed>0||c.actualizada>c.creada+1000;
+    if(editada){const e=document.createElement("span");e.className="insignia der";e.textContent=ed>1?"Editada ×"+ed:"Editada";mini.append(e);}
+    const cu=document.createElement("div");cu.className="tarjeta-cuerpo";
+    const n=document.createElement("b");n.textContent=c.nombre;
+    const t=document.createElement("time");t.textContent=fecha(c.creada)+(ed?" · editada "+plural(ed,"vez","veces"):(editada?" · editada":""));
+    const p=document.createElement("p");p.textContent=c.modo==="texto"?c.texto:"Carta escrita a mano";
+    cu.append(n,t,p);b.append(mini,cu);
+    b.addEventListener("click",()=>abrir(c));
+    caja.append(b);
+    if(obs)obs.observe(mini);else ponerMiniatura(mini);
+  });
+}
+
+function ponerMiniatura(mini){
+  const id=mini.dataset.foto;if(!id)return;
+  imagen(+id).then(u=>{
+    const im=document.createElement("img");im.alt="";im.src=u;
+    mini.querySelector(".ph")?.remove();mini.prepend(im);
+  }).catch(()=>{});
+}
+
+function nombreArchivo(c,ext){
+  const n=c.nombre.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+  return "carta-para-eliana-"+(n||"sin-nombre")+"."+ext;
+}
+
+function bajar(href,nombre){
+  const a=document.createElement("a");a.href=href;a.download=nombre;document.body.append(a);a.click();a.remove();
+}
+
+function verGrande(u){window.open(u,"_blank","noopener");}
+
+async function abrir(c){
+  abierta=c;
+  $("velo").hidden=false;document.body.style.overflow="hidden";
+  $("velo").scrollTop=0;
+  const ed=c.ediciones||0;
+  $("meta").textContent="Enviada el "+fecha(c.creada)+(c.actualizada>c.creada+1000?" · "+(ed?"editada "+plural(ed,"vez","veces")+", ":"")+"última edición "+fecha(c.actualizada):"");
+  $("hist").hidden=true;$("histLista").innerHTML="";
+  let det=null;
+  const cargaDetalle=(c.modo==="mano"||ed>0)?api("/api/cartas/"+c.id).then(r=>r.json()).catch(()=>null):Promise.resolve(null);
+  $("quien").textContent=c.nombre;
+  $("pie").textContent=c.nombre+" y Eliana";
+  $("avisoSin").hidden=!!c.foto_id;
+  $("btnFoto").hidden=!c.foto_id;
+  $("btnTexto").hidden=c.modo!=="texto";
+  const marco=$("marco");marco.innerHTML="<i class=\"ph ph-camera\"></i>";
+  if(c.foto_id)imagen(c.foto_id).then(u=>{if(abierta!==c)return;const im=document.createElement("img");im.src=u;im.alt="Foto con Eliana";im.addEventListener("click",()=>verGrande(u));marco.innerHTML="";marco.append(im);}).catch(()=>aviso("No se pudo cargar la foto."));
+
+  const cuerpo=$("cuerpo");cuerpo.innerHTML="";
+  if(c.modo==="texto"){
+    const d=document.createElement("div");d.className="carta-texto";d.textContent=c.texto;cuerpo.append(d);
+  }else{
+    const caja=document.createElement("div");caja.className="hojas";cuerpo.append(caja);
+    const ph=document.createElement("div");ph.className="vacio";ph.textContent="Cargando hojas…";caja.append(ph);
+    try{
+      det=await cargaDetalle;
+      if(abierta!==c)return;
+      if(!det)throw new Error("detalle");
+      caja.innerHTML="";
+      for(const h of det.carta.hojas){
+        const im=document.createElement("img");im.alt="Hoja de la carta";
+        try{im.src=await imagen(h.id);}catch(e){continue;}
+        const u=im.src;im.addEventListener("click",()=>verGrande(u));caja.append(im);
+      }
+      if(!caja.children.length)caja.innerHTML="<div class=\"vacio\">No se pudieron cargar las hojas.</div>";
+    }catch(e){caja.innerHTML="<div class=\"vacio\">No se pudieron cargar las hojas.</div>";}
+  }
+  if(ed>0){
+    if(!det)det=await cargaDetalle;
+    if(abierta===c&&det&&det.carta)pintarHistorial(det.carta);
+  }
+}
+
+function diffPalabras(a,b){
+  const x=a.split(/(\s+)/).filter(s=>s!==""),y=b.split(/(\s+)/).filter(s=>s!=="");
+  const n=x.length,m=y.length;
+  if(n*m>6000000)return null;
+  const w=m+1,t=new Uint16Array((n+1)*w);
+  for(let i=n-1;i>=0;i--)for(let j=m-1;j>=0;j--)t[i*w+j]=x[i]===y[j]?t[(i+1)*w+j+1]+1:Math.max(t[(i+1)*w+j],t[i*w+j+1]);
+  const ops=[];
+  const sumar=(k,s)=>{const u=ops[ops.length-1];if(u&&u.k===k)u.s+=s;else ops.push({k,s});};
+  let i=0,j=0;
+  while(i<n&&j<m){
+    if(x[i]===y[j]){sumar("=",x[i]);i++;j++;}
+    else if(t[(i+1)*w+j]>=t[i*w+j+1]){sumar("-",x[i]);i++;}
+    else{sumar("+",y[j]);j++;}
+  }
+  while(i<n)sumar("-",x[i++]);
+  while(j<m)sumar("+",y[j++]);
+  return ops;
+}
+
+function minis(imgs){
+  const caja=document.createElement("div");caja.className="minis";
+  if(!imgs.length){const s=document.createElement("span");s.className="sin";s.textContent="Ninguna";caja.append(s);return caja;}
+  imgs.forEach(it=>{
+    const im=document.createElement("img");im.alt="";
+    imagen(it.id).then(u=>{im.src=u;im.addEventListener("click",()=>verGrande(u));}).catch(()=>{});
+    caja.append(im);
+  });
+  return caja;
+}
+
+function columna(clase,titulo,contenido){
+  const c=document.createElement("div");c.className="col "+clase;
+  const s=document.createElement("small");s.textContent=titulo;c.append(s);
+  if(typeof contenido==="string")c.append(document.createTextNode(contenido));else c.append(contenido);
+  return c;
+}
+
+function bloque(titulo,...hijos){
+  const b=document.createElement("div");b.className="cambio";
+  const t=document.createElement("div");t.className="cambio-tit";t.textContent=titulo;
+  b.append(t,...hijos);
+  return b;
+}
+
+function antesAhora(antes,ahora){
+  const g=document.createElement("div");g.className="antes-ahora";
+  g.append(antes,ahora);
+  return g;
+}
+
+function pintarHistorial(carta){
+  const vs=carta.versiones||[];
+  if(!vs.length)return;
+  const caja=$("histLista");caja.innerHTML="";
+  const estados=[...vs,carta];
+  const forma=m=>m==="mano"?"Escrita a mano":"Escrita en la página";
+
+  for(let i=vs.length;i>=1;i--){
+    const antes=estados[i-1],ahora=estados[i],cuando=vs[i-1].hasta;
+    const card=document.createElement("div");card.className="edicion";
+    const cab=document.createElement("div");cab.className="edicion-cab";
+    const tit=document.createElement("b");tit.textContent="Edición "+i+(i===vs.length?" (la más reciente)":"");
+    const fe=document.createElement("span");fe.textContent=fecha(cuando)+" · la versión anterior duró desde "+fecha(antes.desde);
+    cab.append(tit,fe);card.append(cab);
+
+    const chips=document.createElement("div");chips.className="edicion-chips";
+    const cuerpos=[];
+    if(antes.nombre!==ahora.nombre){
+      chips.append(chip("Nombre"));
+      cuerpos.push(bloque("Nombre",antesAhora(columna("antes","Antes",antes.nombre),columna("ahora","Ahora",ahora.nombre))));
+    }
+    if(antes.modo!==ahora.modo){
+      chips.append(chip("Forma de la carta"));
+      cuerpos.push(bloque("Forma de la carta",antesAhora(columna("antes","Antes",forma(antes.modo)),columna("ahora","Ahora",forma(ahora.modo)))));
+    }
+    if(antes.texto!==ahora.texto){
+      chips.append(chip("Mensaje"));
+      const ops=diffPalabras(antes.texto,ahora.texto);
+      if(ops){
+        const d=document.createElement("div");d.className="diff";
+        ops.forEach(o=>{
+          if(o.k==="=")d.append(document.createTextNode(o.s));
+          else{const e=document.createElement(o.k==="-"?"del":"ins");e.textContent=o.s;d.append(e);}
+        });
+        const ley=document.createElement("div");ley.className="leyenda";
+        ley.innerHTML="<del>tachado</del> lo que se quitó · <ins>verde</ins> lo que se agregó";
+        cuerpos.push(bloque("Mensaje",d,ley));
+      }else{
+        cuerpos.push(bloque("Mensaje",antesAhora(columna("antes","Antes",antes.texto||"(vacío)"),columna("ahora","Ahora",ahora.texto||"(vacío)"))));
+      }
+    }
+    const fa=antes.foto?antes.foto.bytes:null,fb=ahora.foto?ahora.foto.bytes:null;
+    if(fa!==fb){
+      chips.append(chip("Foto con Eliana"));
+      cuerpos.push(bloque("Foto con Eliana",antesAhora(columna("antes","Antes",minis(antes.foto?[antes.foto]:[])),columna("ahora","Ahora",minis(ahora.foto?[ahora.foto]:[])))));
+    }
+    if(antes.hojas.map(h=>h.bytes).join(",")!==ahora.hojas.map(h=>h.bytes).join(",")){
+      chips.append(chip("Hojas a mano"));
+      cuerpos.push(bloque("Hojas a mano",antesAhora(columna("antes","Antes ("+antes.hojas.length+")",minis(antes.hojas)),columna("ahora","Ahora ("+ahora.hojas.length+")",minis(ahora.hojas)))));
+    }
+    if(!cuerpos.length){
+      chips.append(chip("Sin cambios visibles"));
+    }
+    card.append(chips,...cuerpos);
+
+    const det=document.createElement("details");det.className="anterior";
+    const sm=document.createElement("summary");sm.textContent="Ver cómo era antes, completa";det.append(sm);
+    const ab=document.createElement("div");ab.className="anterior-cuerpo";
+    const nom=document.createElement("div");nom.className="nom";nom.textContent="De: "+antes.nombre+" · "+forma(antes.modo);ab.append(nom);
+    if(antes.modo==="texto"){const pre=document.createElement("pre");pre.textContent=antes.texto;ab.append(pre);}
+    ab.append(minis([...(antes.foto?[antes.foto]:[]),...antes.hojas]));
+    det.append(ab);card.append(det);
+    caja.append(card);
+  }
+  $("hist").hidden=false;
+}
+
+function chip(t){const s=document.createElement("span");s.textContent=t;return s;}
+
+function cerrar(){abierta=null;$("velo").hidden=true;document.body.style.overflow="";}
+
+$("btnCerrar").addEventListener("click",cerrar);
+$("velo").addEventListener("click",e=>{if(e.target===$("velo"))cerrar();});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("velo").hidden)cerrar();});
+
+$("btnPng").addEventListener("click",async()=>{
+  if(!abierta||typeof html2canvas!=="function")return;
+  const b=$("btnPng"),sp=b.querySelector("span"),previo=sp.textContent;b.disabled=true;sp.textContent="Preparando…";
+  try{
+    if(document.fonts&&document.fonts.ready)await document.fonts.ready;
+    const nodo=$("carta"),escala=Math.max(1,Math.min(2,15000/nodo.offsetHeight));
+    const lienzo=await html2canvas(nodo,{scale:escala,backgroundColor:"#f3f4f8",useCORS:true,logging:false});
+    const blob=await new Promise(ok=>lienzo.toBlob(ok,"image/png"));
+    const u=URL.createObjectURL(blob);bajar(u,nombreArchivo(abierta,"png"));setTimeout(()=>URL.revokeObjectURL(u),4000);
+  }catch(e){aviso("No se pudo crear la imagen.");}
+  finally{b.disabled=false;sp.textContent=previo;}
+});
+
+$("btnFoto").addEventListener("click",async()=>{
+  if(!abierta||!abierta.foto_id)return;
+  try{bajar(await imagen(abierta.foto_id),nombreArchivo(abierta,"jpg").replace("carta-para-eliana-","foto-con-eliana-"));}
+  catch(e){aviso("No se pudo descargar la foto.");}
+});
+
+$("btnTexto").addEventListener("click",async()=>{
+  if(!abierta)return;
+  const t="Para Eliana:\n\n"+abierta.texto+"\n\nCon cariño,\n"+abierta.nombre;
+  try{await navigator.clipboard.writeText(t);aviso("Texto copiado.");}
+  catch(e){aviso("No se pudo copiar el texto.");}
+});
+
+document.querySelectorAll(".chip").forEach(b=>b.addEventListener("click",()=>{
+  filtro=b.dataset.f;document.querySelectorAll(".chip").forEach(x=>x.classList.toggle("on",x===b));pintarLista();
+}));
+$("buscar").addEventListener("input",pintarLista);
+$("btnActualizar").addEventListener("click",()=>cargar().then(()=>aviso("Lista actualizada.")));
+
+$("btnSalir").addEventListener("click",()=>{
+  try{localStorage.removeItem(CLAVE_GUARDADA);}catch(e){}
+  limpiar();$("clave").value="";mostrarAcceso();
+});
+
+$("formAcceso").addEventListener("submit",async e=>{
+  e.preventDefault();
+  clave=$("clave").value.trim();if(!clave)return;
+  const b=$("btnEntrar"),sp=b.querySelector("span");b.disabled=true;sp.textContent="Entrando…";
+  await cargar();
+  if(!$("app").hidden&&$("recordar").checked){try{localStorage.setItem(CLAVE_GUARDADA,clave);}catch(x){}}
+  b.disabled=false;sp.textContent="Entrar";
+});
+
+const PASOS=["Tu nombre","Mensaje","Foto","Tu carta"];
+let dispositivos=[],desfase=0,vista="cartas",sondeo=null,reloj=null,verSalieron=false;
+const abiertos=new Set();
+
+function situacion(d,ahora){
+  const edad=ahora-d.ultima;
+  if(d.estado==="salio")return {k:"fuera",t:"Se salió"};
+  if(d.estado==="oculto")return edad>300000?{k:"fuera",t:"Inactivo"}:{k:"oculto",t:"En segundo plano"};
+  return edad<=30000?{k:"linea",t:"En línea"}:{k:"fuera",t:"Sin señal"};
+}
+
+function hace(ms){
+  const s=Math.max(0,Math.round(ms/1000));
+  if(s<5)return "ahora mismo";
+  if(s<60)return "hace "+s+" s";
+  if(s<3600)return "hace "+Math.round(s/60)+" min";
+  if(s<86400)return "hace "+Math.round(s/3600)+" h";
+  return "hace "+Math.round(s/86400)+" d";
+}
+
+function plural(n,uno,varios){return n+" "+(n===1?uno:varios);}
+
+function pintarVivo(){
+  const ahora=Date.now()-desfase;
+  const lista=dispositivos.map(d=>({d,s:situacion(d,ahora)}));
+  const orden={linea:0,oculto:1,fuera:2};
+  lista.sort((a,b)=>orden[a.s.k]-orden[b.s.k]||b.d.ultima-a.d.ultima);
+
+  const vivos=lista.filter(x=>x.s.k!=="fuera");
+  const fuera=lista.filter(x=>x.s.k==="fuera");
+  const enLinea=vivos.filter(x=>x.s.k==="linea").length,oculto=vivos.length-enLinea;
+  const num=$("numVivo");num.textContent=enLinea;num.classList.toggle("cero",!enLinea);
+  if(vista!=="vivo")return;
+
+  const entradas=dispositivos.reduce((a,d)=>a+d.visitas,0);
+  $("resumenVivo").innerHTML="";
+  [["En línea",enLinea],["En segundo plano",oculto]].forEach(([t,n])=>{
+    const e=document.createElement("div");e.className="dato-vivo";
+    const b=document.createElement("b");b.textContent=n;e.append(b,document.createTextNode(t));
+    $("resumenVivo").append(e);
+  });
+  const bs=document.createElement("button");bs.type="button";bs.className="dato-vivo boton";bs.setAttribute("aria-pressed",verSalieron);
+  const bn=document.createElement("b");bn.textContent=fuera.length;
+  bs.append(bn,document.createTextNode("Ya salieron "),Object.assign(document.createElement("i"),{className:"ph "+(verSalieron?"ph-caret-up":"ph-caret-down")}));
+  bs.addEventListener("click",()=>{verSalieron=!verSalieron;pintarVivo();});
+  $("resumenVivo").append(bs);
+  [["Dispositivos",lista.length],["Entradas en total",entradas]].forEach(([t,n])=>{
+    const e=document.createElement("div");e.className="dato-vivo";
+    const b=document.createElement("b");b.textContent=n;e.append(b,document.createTextNode(t));
+    $("resumenVivo").append(e);
+  });
+
+  const caja=$("listaVivo");caja.innerHTML="";
+  $("vacioVivo").hidden=vivos.length>0;
+  $("vacioVivoTxt").textContent=lista.length?"No hay nadie conectado en este momento.":"Todavía no se ha conectado nadie.";
+  vivos.forEach(x=>caja.append(tarjetaVivo(x,ahora)));
+
+  const caja2=$("listaSalieron");caja2.innerHTML="";
+  $("salieron").hidden=!(verSalieron&&fuera.length);
+  if(verSalieron)fuera.forEach(x=>caja2.append(tarjetaVivo(x,ahora)));
+}
+
+function esBot(d){return /^(Linux|Otro)/.test(d.ua);}
+
+function marcaSalio(d){
+  if(esBot(d))return "Posible bot";
+  if(!d.nombre&&!d.caracteres&&!d.enviadas&&d.paso===1&&d.visitas===1)return "Solo miró";
+  return "";
+}
+
+function tarjetaVivo({d,s},ahora){
+    const card=document.createElement("div");card.className="disp "+s.k;
+    const cab=document.createElement("button");cab.type="button";cab.className="disp-cab";cab.setAttribute("aria-expanded",abiertos.has(d.id));
+    const punto=document.createElement("span");punto.className="punto";
+    const info=document.createElement("div");info.className="disp-info";
+    const nom=document.createElement("div");nom.className="disp-nombre";
+    const n=document.createElement("span");n.textContent=d.nombre||"Sin nombre todavía";if(!d.nombre)n.className="sin";
+    const est=document.createElement("span");est.className="estado";est.textContent=s.t;
+    nom.append(n,est);
+    const marca=s.k==="fuera"?marcaSalio(d):"";
+    if(marca){const m=document.createElement("span");m.className="estado";m.style.cssText="background:#fee2e2;color:#991b1b";m.textContent=marca;nom.append(m);}
+    if(d.enviadas){const ok=document.createElement("span");ok.className="estado";ok.style.cssText="background:#dbeafe;color:#1e40af";ok.textContent=plural(d.enviadas,"carta enviada","cartas enviadas");nom.append(ok);}
+    const sub=document.createElement("div");sub.className="disp-sub";
+    [["ph-footprints","Paso "+d.paso+": "+PASOS[d.paso-1]],["ph-clock",s.k==="linea"?"activo "+hace(ahora-d.ultima):hace(ahora-d.ultima)],["ph-arrow-bend-down-right","Entró "+plural(d.visitas,"vez","veces")]].forEach(([ic,t])=>{
+      const sp=document.createElement("span");sp.innerHTML="<i class=\"ph "+ic+"\"></i>";sp.append(document.createTextNode(t));sub.append(sp);
+    });
+    info.append(nom,sub);
+    if(d.enviadas>0){
+      let nombres=[];try{nombres=JSON.parse(d.enviadas_nombres||"[]");}catch(e){}
+      const av=document.createElement("div");av.className="disp-aviso";
+      av.innerHTML="<i class=\"ph ph-envelope-simple-open\"></i>";
+      const tx=document.createElement("span");
+      tx.textContent="Este dispositivo ya envió "+(d.enviadas===1?"una carta":d.enviadas+" cartas")+(nombres.length?" a nombre de: "+nombres.map(n=>"«"+n+"»").join(", "):"")+".";
+      av.append(tx);info.append(av);
+    }
+    const prog=document.createElement("div");prog.className="progreso";prog.setAttribute("aria-hidden","true");
+    for(let k=1;k<=4;k++){const i=document.createElement("i");if(k<=d.paso)i.className="ok";prog.append(i);}
+    cab.append(punto,info,prog);
+    card.append(cab);
+    if(abiertos.has(d.id))card.append(cuerpoVivo(d,ahora));
+    cab.addEventListener("click",()=>{if(abiertos.has(d.id))abiertos.delete(d.id);else abiertos.add(d.id);pintarVivo();});
+    return card;
+}
+
+function cuerpoVivo(d,ahora){
+  const c=document.createElement("div");c.className="disp-cuerpo";
+  const st=document.createElement("div");st.className="disp-stats";
+  const datos=[
+    d.modo==="mano"?"Carta a mano"+(d.hojas?" · "+plural(d.hojas,"hoja","hojas"):""):plural(d.palabras,"palabra","palabras")+" · "+plural(d.caracteres,"carácter","caracteres"),
+    d.foto?"Foto con Eliana subida":"Sin foto todavía",
+    "Salió "+plural(d.salidas,"vez","veces"),
+    d.ua,
+    "Primera vez: "+fecha(d.primera),
+    "Última señal: "+fecha(d.ultima)+" ("+hace(ahora-d.ultima)+")"
+  ];
+  datos.forEach(t=>{const s=document.createElement("span");s.textContent=t;st.append(s);});
+  const b=document.createElement("div");b.className="disp-borrador";
+  if(d.modo==="mano"){b.classList.add("vacio");b.textContent="Va a subir su carta escrita a mano; no hay texto que mostrar.";}
+  else if(d.texto){b.textContent=d.texto+(d.caracteres>d.texto.length?"…":"");}
+  else{b.classList.add("vacio");b.textContent="Todavía no ha escrito nada.";}
+  c.append(st,b);
+  return c;
+}
+
+async function sondear(){
+  if(!clave||document.hidden)return;
+  try{
+    const j=await (await api("/api/presencia")).json();
+    dispositivos=j.dispositivos||[];desfase=Date.now()-j.ahora;
+    pintarVivo();
+  }catch(e){
+    if(e.codigo===401){detenerSondeo();try{localStorage.removeItem(CLAVE_GUARDADA);}catch(x){}limpiar();mostrarAcceso("La clave no es correcta.");}
+  }
+}
+
+function iniciarSondeo(){
+  detenerSondeo();
+  sondear();
+  sondeo=setInterval(sondear,10000);
+  reloj=setInterval(()=>{if(vista==="vivo"&&!document.hidden)pintarVivo();},3000);
+}
+
+function detenerSondeo(){
+  clearInterval(sondeo);clearInterval(reloj);sondeo=reloj=null;
+  dispositivos=[];$("numVivo").textContent="0";$("numVivo").classList.add("cero");
+}
+
+function cambiarVista(v){
+  vista=v;
+  $("vistaCartas").hidden=v!=="cartas";$("vistaVivo").hidden=v!=="vivo";
+  document.querySelectorAll(".pestana").forEach(b=>b.classList.toggle("on",b.dataset.v===v));
+  if(v==="vivo"){pintarVivo();sondear();}
+}
+document.querySelectorAll(".pestana").forEach(b=>b.addEventListener("click",()=>cambiarVista(b.dataset.v)));
+document.addEventListener("visibilitychange",()=>{if(!document.hidden&&clave)sondear();});
+
+(function(){
+  let g=null;try{g=localStorage.getItem(CLAVE_GUARDADA);}catch(e){}
+  if(g){clave=g;$("recordar").checked=true;cargar();}
+})();
+</script>
+</body>
+</html>
