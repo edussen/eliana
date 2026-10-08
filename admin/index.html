@@ -100,6 +100,18 @@
   .vacio{padding:60px 16px;text-align:center;color:var(--texto-tenue)}
   .vacio .ph{font-size:2.6rem;display:block;margin-bottom:8px}
 
+  .chips{flex-wrap:wrap}
+  .btn.verde{color:#166534;border-color:#bbf7d0}
+  .btn.verde:hover{background:#f0fdf4}
+  .btn.verde.hecha{background:#16a34a;border-color:#16a34a;color:#fff}
+  .btn.verde.hecha:hover{background:#15803d}
+  .btn.verde.solido{background:#16a34a;border-color:#16a34a;color:#fff}
+  .btn.verde.solido:hover{background:#15803d}
+  .btn.verde.solido:disabled{opacity:.45;cursor:not-allowed}
+  .vb{display:inline-flex;align-items:center;gap:5px;margin-bottom:8px;padding:2px 10px;border-radius:999px;font-size:.72rem;font-weight:800}
+  .vb.ok{background:#dcfce7;color:#166534}
+  .vb.pend{background:#eceef3;color:#5b6470}
+  .tarjeta.verificada{box-shadow:inset 0 -4px 0 #22c55e,var(--sombra)}
   .btn.peligro{color:#b91c1c;border-color:#fecaca}
   .btn.peligro:hover{background:#fef2f2}
   .btn.peligro.solido{background:#dc2626;border-color:#dc2626;color:#fff}
@@ -114,9 +126,6 @@
   .tarjeta.sel{outline:3px solid var(--marca);outline-offset:-3px}
   .check{position:absolute;right:10px;bottom:10px;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.92);border:2px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.3);color:transparent;font-size:1.1rem}
   .tarjeta.sel .check{background:var(--marca);color:#fff}
-  .tarjeta-correo{display:flex;align-items:center;gap:6px;margin-top:8px;font-size:.8rem;font-weight:700;color:#1d4ed8;overflow-wrap:anywhere}
-  .meta-correo{display:flex;align-items:center;gap:6px;margin-top:-8px}
-  .meta-correo a{color:#1d4ed8;font-weight:700;overflow-wrap:anywhere}
   .insignia.abajo{left:10px;top:auto;bottom:10px;background:#1d4ed8;display:inline-flex;align-items:center;gap:5px}
   .rejilla{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
   .tarjeta{display:flex;flex-direction:column;text-align:left;background:var(--superficie);border-radius:var(--r-md);overflow:hidden;box-shadow:var(--sombra);transition:transform .15s ease}
@@ -245,6 +254,8 @@
         <button type="button" class="chip" data-f="texto">Escritas</button>
         <button type="button" class="chip" data-f="mano">A mano</button>
         <button type="button" class="chip" data-f="fotos">Varias fotos</button>
+        <button type="button" class="chip" data-f="pendientes">Pendientes</button>
+        <button type="button" class="chip" data-f="verificadas">Verificadas</button>
       </div>
       <button type="button" class="btn" id="btnSeleccionar"><i class="ph ph-check-square" aria-hidden="true"></i><span>Seleccionar</span></button>
     </div>
@@ -257,6 +268,7 @@
 <div class="barra-borrar" id="barraBorrar" hidden>
   <span id="selTxt">Ninguna seleccionada</span>
   <button type="button" class="btn" id="btnSelTodas">Seleccionar todas</button>
+  <button type="button" class="btn verde solido" id="btnVerificarSel" disabled><i class="ph ph-seal-check" aria-hidden="true"></i>Marcar verificadas</button>
   <button type="button" class="btn peligro solido" id="btnBorrarSel" disabled><i class="ph ph-trash" aria-hidden="true"></i>Borrar</button>
   <button type="button" class="btn" id="btnSelCancelar">Cancelar</button>
 </div>
@@ -267,13 +279,12 @@
       <button type="button" class="btn principal" id="btnPng"><i class="ph ph-download-simple" aria-hidden="true"></i><span>Descargar carta</span></button>
       <button type="button" class="btn" id="btnFoto"><i class="ph ph-image" aria-hidden="true"></i><span>Foto</span></button>
       <button type="button" class="btn" id="btnTexto"><i class="ph ph-copy" aria-hidden="true"></i>Copiar texto</button>
+      <button type="button" class="btn verde" id="btnVerificar"><i class="ph ph-seal-check" aria-hidden="true"></i><span>Marcar como verificada</span></button>
       <button type="button" class="btn peligro" id="btnBorrar"><i class="ph ph-trash" aria-hidden="true"></i>Borrar</button>
       <span class="espacio"></span>
       <button type="button" class="cerrar" id="btnCerrar" aria-label="Cerrar"><i class="ph ph-x" aria-hidden="true"></i></button>
     </div>
-    <p class="meta" id="meta"></p>
-    <p class="meta meta-correo" id="metaCorreo" hidden><i class="ph ph-envelope-simple" aria-hidden="true"></i><a id="correoLink"></a></p>
-    <div class="aviso-sin" id="avisoSin" hidden><i class="ph ph-warning" aria-hidden="true"></i><span>Esta carta no tiene la foto guardada. Si la persona la vuelve a enviar desde su dispositivo, aparecerá completa.</span></div>
+    <p class="meta" id="meta"></p>    <div class="aviso-sin" id="avisoSin" hidden><i class="ph ph-warning" aria-hidden="true"></i><span>Esta carta no tiene la foto guardada. Si la persona la vuelve a enviar desde su dispositivo, aparecerá completa.</span></div>
     <article class="carta" id="carta">
       <div class="carta-cab"><span class="para">Para Eliana</span><span class="fecha">8 oct 2026</span></div>
       <div id="cuerpo"></div>
@@ -354,21 +365,22 @@ async function cargar(){
 
 function visibles(){
   const q=$("buscar").value.trim().toLowerCase();
-  return cartas.filter(c=>(filtro==="todas"||(filtro==="fotos"?(c.fotos||0)>1:c.modo===filtro))&&(!q||c.nombre.toLowerCase().includes(q)||(c.texto||"").toLowerCase().includes(q)||(c.correo||"").toLowerCase().includes(q)));
+  const coincide=c=>filtro==="todas"||(filtro==="fotos"?(c.fotos||0)>1:filtro==="pendientes"?!c.verificada:filtro==="verificadas"?!!c.verificada:c.modo===filtro);
+  return cartas.filter(c=>coincide(c)&&(!q||c.nombre.toLowerCase().includes(q)||(c.texto||"").toLowerCase().includes(q)));
 }
 
 function pintarLista(){
   const lista=visibles(),caja=$("rejilla");
   caja.innerHTML="";
   const esc=cartas.filter(c=>c.modo==="texto").length,man=cartas.length-esc,varias=cartas.filter(c=>(c.fotos||0)>1).length;
-  $("resumen").textContent=cartas.length?cartas.length+(cartas.length===1?" carta":" cartas")+" · "+esc+" escritas · "+man+" a mano"+(varias?" · "+varias+" con varias fotos":""):"Sin cartas todavía";
+  $("resumen").textContent=cartas.length?cartas.length+(cartas.length===1?" carta":" cartas")+" · "+esc+" escritas · "+man+" a mano"+(varias?" · "+varias+" con varias fotos":"")+" · "+cartas.filter(c=>c.verificada).length+" verificadas":"Sin cartas todavía";
   $("vacio").hidden=lista.length>0;
   $("vacioTxt").textContent=cartas.length?"No hay cartas que coincidan con tu búsqueda.":"Todavía no ha llegado ninguna carta.";
   const obs="IntersectionObserver" in window?new IntersectionObserver(es=>es.forEach(en=>{
     if(!en.isIntersecting)return;obs.unobserve(en.target);ponerMiniatura(en.target);
   }),{rootMargin:"200px"}):null;
   lista.forEach(c=>{
-    const b=document.createElement("button");b.type="button";b.className="tarjeta"+(modoSel&&seleccion.has(c.id)?" sel":"");b.dataset.id=c.id;
+    const b=document.createElement("button");b.type="button";b.className="tarjeta"+(modoSel&&seleccion.has(c.id)?" sel":"")+(c.verificada?" verificada":"");b.dataset.id=c.id;
     const mini=document.createElement("div");mini.className="miniatura";mini.dataset.foto=c.foto_id||"";
     mini.innerHTML="<i class=\"ph ph-camera\"></i>";
     const ins=document.createElement("span");ins.className="insignia";ins.textContent=c.modo==="mano"?"A mano · "+c.hojas+(c.hojas===1?" hoja":" hojas"):"Escrita";
@@ -381,8 +393,10 @@ function pintarLista(){
     const n=document.createElement("b");n.textContent=c.nombre;
     const t=document.createElement("time");t.textContent=fecha(c.creada)+(ed?" · editada "+plural(ed,"vez","veces"):(editada?" · editada":""));
     const p=document.createElement("p");p.textContent=c.modo==="texto"?c.texto:"Carta escrita a mano";
-    cu.append(n,t,p);
-    if(c.correo){const m=document.createElement("div");m.className="tarjeta-correo";m.innerHTML="<i class=\"ph ph-envelope-simple\"></i>";m.append(document.createTextNode(c.correo));cu.append(m);}
+    const vb=document.createElement("span");vb.className="vb "+(c.verificada?"ok":"pend");
+    vb.innerHTML="<i class=\"ph "+(c.verificada?"ph-seal-check":"ph-hourglass")+"\"></i>";
+    vb.append(document.createTextNode(c.verificada?"Verificada":"Pendiente"));
+    cu.append(n,t,vb,p);
     b.append(mini,cu);
     b.addEventListener("click",()=>{if(modoSel)alternarSel(c.id);else abrir(c);});
     caja.append(b);
@@ -397,6 +411,7 @@ function actualizarBarra(){
   const n=seleccion.size;
   $("selTxt").textContent=n?(n===1?"1 carta seleccionada":n+" cartas seleccionadas"):"Toca las cartas que quieras borrar";
   $("btnBorrarSel").disabled=!n;
+  $("btnVerificarSel").disabled=!n;
 }
 
 function alternarSel(id){
@@ -437,6 +452,31 @@ async function borrarCartas(lista){
   return borradas>0;
 }
 
+async function apiVerificar(id,valor){
+  const r=await fetch(API_URL+"/api/cartas/"+id+"/verificada",{method:"POST",headers:{Authorization:"Bearer "+clave,"Content-Type":"application/json"},body:JSON.stringify({verificada:valor})});
+  if(r.status===401){const e=new Error("clave");e.codigo=401;throw e;}
+  if(!r.ok)throw new Error("http "+r.status);
+  return r.json();
+}
+
+async function fijarVerificadas(lista,valor){
+  let bien=0,mal=0;
+  for(const c of lista){
+    try{const j=await apiVerificar(c.id,valor);c.verificada=j.verificada?1:0;c.verificada_en=j.verificada_en;bien++;}
+    catch(e){if(e.codigo===401){limpiar();mostrarAcceso("La clave no es correcta.");return false;}mal++;}
+  }
+  aviso(mal?"Se actualizaron "+bien+" y fallaron "+mal+".":(valor?(bien===1?"Carta marcada como verificada.":bien+" cartas marcadas como verificadas."):(bien===1?"La carta volvió a pendiente.":bien+" cartas volvieron a pendiente.")));
+  pintarLista();
+  return bien>0;
+}
+
+function pintarBotonVerificar(c){
+  const b=$("btnVerificar"),on=!!c.verificada;
+  b.classList.toggle("hecha",on);
+  b.querySelector("span").textContent=on?"Verificada":"Marcar como verificada";
+  b.title=on&&c.verificada_en?"Verificada el "+fecha(c.verificada_en)+" · toca para quitar la marca":"Marca esta carta cuando ya la hayas visto.";
+}
+
 function ponerMiniatura(mini){
   const id=mini.dataset.foto;if(!id)return;
   imagen(+id).then(u=>{
@@ -458,12 +498,11 @@ function verGrande(u){window.open(u,"_blank","noopener");}
 
 async function abrir(c){
   abierta=c;
+  pintarBotonVerificar(c);
   $("velo").hidden=false;document.body.style.overflow="hidden";
   $("velo").scrollTop=0;
   const ed=c.ediciones||0;
   $("meta").textContent="Enviada el "+fecha(c.creada)+(c.actualizada>c.creada+1000?" · "+(ed?"editada "+plural(ed,"vez","veces")+", ":"")+"última edición "+fecha(c.actualizada):"");
-  $("metaCorreo").hidden=!c.correo;
-  if(c.correo){$("correoLink").textContent=c.correo;$("correoLink").href="mailto:"+encodeURIComponent(c.correo).replace(/%40/g,"@");}
   $("hist").hidden=true;$("histLista").innerHTML="";
   let det=null;
   const cargaDetalle=api("/api/cartas/"+c.id).then(r=>r.json()).catch(()=>null);
@@ -651,6 +690,18 @@ $("btnSelTodas").addEventListener("click",()=>{
 $("btnBorrarSel").addEventListener("click",async()=>{
   const lista=cartas.filter(c=>seleccion.has(c.id));
   if(await borrarCartas(lista)){modoSel=false;seleccion.clear();actualizarBarra();await cargar();}
+});
+$("btnVerificar").addEventListener("click",async()=>{
+  if(!abierta)return;
+  const c=abierta;
+  await fijarVerificadas([c],!c.verificada);
+  if(abierta===c)pintarBotonVerificar(c);
+});
+$("btnVerificarSel").addEventListener("click",async()=>{
+  const lista=cartas.filter(c=>seleccion.has(c.id));
+  if(!lista.length)return;
+  const todasOk=lista.every(c=>c.verificada);
+  if(await fijarVerificadas(lista,!todasOk)){modoSel=false;seleccion.clear();actualizarBarra();pintarLista();}
 });
 $("btnBorrar").addEventListener("click",async()=>{
   if(!abierta)return;
