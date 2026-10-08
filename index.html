@@ -118,10 +118,10 @@
   .seg button:focus-visible,.btn:focus-visible,.zona:focus-within,.quitar:focus-visible,.pb:focus-visible{outline:3px solid #3b82f6;outline-offset:2px}
 
   label.campo{display:block;font-size:.84rem;font-weight:700;color:var(--texto-suave);margin-bottom:8px}
-  textarea,input[type=text],input[type=email]{width:100%;padding:14px 16px;background:var(--superficie);border:1.5px solid var(--borde);border-radius:var(--r-md);font-size:1rem;line-height:1.6;transition:border-color .15s ease,box-shadow .15s ease}
+  textarea,input[type=text]{width:100%;padding:14px 16px;background:var(--superficie);border:1.5px solid var(--borde);border-radius:var(--r-md);font-size:1rem;line-height:1.6;transition:border-color .15s ease,box-shadow .15s ease}
   input.grande{padding:17px 18px;font-size:1.25rem;font-weight:600}
   textarea{min-height:230px;resize:vertical;overflow:hidden}
-  textarea:focus,input[type=text]:focus,input[type=email]:focus{outline:none;border-color:var(--marca);box-shadow:0 0 0 4px rgba(200,0,13,.1)}
+  textarea:focus,input[type=text]:focus{outline:none;border-color:var(--marca);box-shadow:0 0 0 4px rgba(200,0,13,.1)}
   textarea::placeholder,input::placeholder{color:var(--texto-tenue)}
   .contador{display:flex;justify-content:space-between;gap:10px;margin-top:8px;font-size:.78rem;color:var(--texto-tenue)}
 
@@ -192,8 +192,12 @@
   .velo[hidden]{display:none}
   .modal-icono.ok{background:#dcfce7;color:#16a34a}
   .cerrar-esq{position:absolute;right:12px;top:12px}
-  .correo-campo{margin:6px 0 10px;text-align:left;line-height:1.5}
-  #formCorreo .error{margin-bottom:6px;text-align:left}
+  .modal-mensaje{margin:4px 22px 24px;font-family:'Caveat',cursive;font-weight:500;font-size:1.45rem;line-height:1.3;color:#3a342b;text-align:center}
+  .modal-mensaje p+p{margin-top:10px}
+  .modal-adorno{display:flex;align-items:center;gap:12px;margin-bottom:12px;color:var(--marca);font-size:1.15rem}
+  .modal-adorno::before,.modal-adorno::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,transparent,#e5cfcf)}
+  .modal-adorno::after{transform:scaleX(-1)}
+  .modal-firma{display:block;margin-top:14px;text-align:right;font-weight:700;font-size:1.7rem;line-height:1.1;color:var(--marca-oscuro)}
   .modal{position:relative;width:100%;max-width:560px;background:var(--superficie);border-radius:20px;padding:20px 20px 22px;box-shadow:0 20px 50px rgba(0,0,0,.3)}
   .modal-cab{display:flex;align-items:center;justify-content:space-between;gap:12px}
   .modal-cab h2{font-size:1.2rem;font-weight:800;letter-spacing:-.02em}
@@ -257,6 +261,11 @@
   .polaroid .marco img{width:100%;height:100%;object-fit:cover;display:block}
   .polaroid small{display:block;margin-top:7px;text-align:center;font-family:'Caveat',cursive;font-size:1.05rem;color:#6d5f3a;line-height:1.1}
 
+  .btn-musica{position:fixed;left:16px;bottom:16px;z-index:60;width:46px;height:46px;border-radius:50%;display:grid;place-items:center;background:#fff;border:1.5px solid var(--borde);box-shadow:var(--sombra-md);font-size:1.3rem;color:var(--marca);transition:color .15s ease,transform .15s ease}
+  .btn-musica:hover{transform:scale(1.06)}
+  .btn-musica.apagada{color:var(--texto-tenue)}
+  .btn-musica[hidden]{display:none}
+  .btn-musica:focus-visible{outline:3px solid #3b82f6;outline-offset:2px}
   .pie{padding:6px 0 40px;text-align:center;font-size:.8rem;color:var(--texto-tenue)}
   .aviso{position:fixed;left:50%;bottom:24px;z-index:80;max-width:min(92vw,460px);transform:translate(-50%,30px);opacity:0;pointer-events:none;display:flex;align-items:center;gap:10px;padding:13px 18px;border-radius:14px;background:#1c1f23;color:#fff;font-size:.9rem;font-weight:600;box-shadow:0 12px 30px rgba(0,0,0,.28);transition:all .25s ease}
   .aviso.ver{transform:translate(-50%,0);opacity:1}
@@ -465,6 +474,9 @@
 
 </main>
 
+<audio id="musicaFondo" src="musica/baile-inolvidable.mp3" loop preload="auto"></audio>
+<button type="button" class="btn-musica" id="btnMusica" aria-label="Silenciar la música de fondo" title="Música de fondo"><i class="ph ph-speaker-high" aria-hidden="true"></i></button>
+
 <footer class="pie">Hecho con cariño por tus amigos · 8 de octubre de 2026</footer>
 
 <div class="velo" id="veloEnviado" hidden>
@@ -472,13 +484,14 @@
     <button type="button" class="cerrar cerrar-esq" id="cerrarEnviado" aria-label="Cerrar"><i class="ph ph-x" aria-hidden="true"></i></button>
     <div class="modal-icono ok"><i class="ph ph-check-circle" aria-hidden="true"></i></div>
     <h2 id="tEnviado">¡Tu carta fue enviada!</h2>
-    <p class="modal-sub" id="enviadoSub">Ya llegó a quien organiza la sorpresa. Puedes cerrar esta ventana cuando quieras.</p>
-    <form id="formCorreo" novalidate>
-      <label class="campo correo-campo" for="correo">Para mantenerte notificado/a, proporciónanos un correo electrónico. Si no tienes, déjalo en blanco.</label>
-      <input type="email" id="correo" placeholder="tucorreo@ejemplo.com" autocomplete="email" inputmode="email" maxlength="120">
-      <div class="error" id="errCorreo" role="alert"><i class="ph ph-warning-circle" aria-hidden="true"></i><span></span></div>
-      <div class="modal-acciones"><button type="submit" class="btn principal" id="btnListo"><span>Listo</span></button></div>
-    </form>
+    <p class="modal-sub" id="enviadoEstado">Ya llegó.</p>
+    <div class="modal-mensaje">
+      <span class="modal-adorno" aria-hidden="true"><i class="ph ph-heart"></i></span>
+      <p>Gracias por querer darle esta gran sorpresa a mi hermana.</p>
+      <p>Sé que le va a encantar. Cada uno de ustedes es muy importante para ella, y saber que pensaron en ella con tanto cariño hará de este cumpleaños uno inolvidable.</p>
+      <span class="modal-firma">Att: Yilber y Zharick</span>
+    </div>
+    <div class="modal-acciones"><button type="button" class="btn principal" id="btnCerrarEnviado">Cerrar</button></div>
   </div>
 </div>
 
@@ -831,14 +844,14 @@ async function migrarAntigua(){
 
 async function guardarEnviada(){
   if(!envio)return;
-  await guardarRegistro({id:envio.id,token:envio.token,huella:envio.huella,fecha:envio.fecha,correo:envio.correo||"",nombre:$("nombre").value.trim(),modo:estado.modo,texto:$("texto").value,fotos:estado.fotos,paginas:estado.paginas});
+  await guardarRegistro({id:envio.id,token:envio.token,huella:envio.huella,fecha:envio.fecha,nombre:$("nombre").value.trim(),modo:estado.modo,texto:$("texto").value,fotos:estado.fotos,paginas:estado.paginas});
   try{localStorage.setItem(CLAVE_ACTUAL,envio.id);}catch(e){}
   enviadas=await leerEnviadas();
   pintarContadorEnviadas();
 }
 
 function aplicarRegistro(g){
-  envio={id:g.id,token:g.token,huella:g.huella,fecha:g.fecha,correo:g.correo||""};
+  envio={id:g.id,token:g.token,huella:g.huella,fecha:g.fecha};
   $("nombre").value=g.nombre||"";$("texto").value=g.texto||"";
   estado.modo=g.modo==="mano"?"mano":"texto";
   estado.fotos=Array.isArray(g.fotos)?g.fotos.slice():(g.foto?[g.foto]:[]);
@@ -984,7 +997,6 @@ async function enviarCarta(){
     };
     const cabeceras={"Content-Type":"application/json"};
     let r,datos;
-    const correoPrevio=envio&&envio.correo?envio.correo:"";
     let edicion=!!envio;
     if(envio){
       r=await fetch(API_URL+"/api/cartas/"+envio.id,{method:"PUT",headers:{...cabeceras,"X-Token":envio.token},body:JSON.stringify(cuerpo)});
@@ -993,7 +1005,7 @@ async function enviarCarta(){
     if(!envio){r=await fetch(API_URL+"/api/cartas",{method:"POST",headers:cabeceras,body:JSON.stringify(cuerpo)});}
     datos=await r.json().catch(()=>({}));
     if(!r.ok||!datos.ok){aviso(datos.error||"No se pudo enviar. Intenta de nuevo.");return;}
-    envio={id:datos.id,token:datos.token||(envio&&envio.token),huella:huella(),fecha:datos.actualizada,correo:edicion?correoPrevio:""};
+    envio={id:datos.id,token:datos.token||(envio&&envio.token),huella:huella(),fecha:datos.actualizada};
     await guardarEnviada();
     latido("activo");
     abrirModalEnviado(edicion);
@@ -1005,41 +1017,16 @@ async function enviarCarta(){
   }
 }
 
-const FORMATO_CORREO=/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-
 function abrirModalEnviado(actualizada){
   $("tEnviado").textContent=actualizada?"¡Cambios enviados!":"¡Tu carta fue enviada!";
-  $("enviadoSub").textContent=(actualizada?"Tu carta ya quedó actualizada. ":"Ya llegó a quien organiza la sorpresa. ")+"Puedes cerrar esta ventana cuando quieras.";
-  $("correo").value=envio&&envio.correo?envio.correo:"";
-  $("errCorreo").classList.remove("ver");
+  $("enviadoEstado").textContent=actualizada?"Tu carta ya quedó actualizada.":"Ya llegó.";
   $("veloEnviado").hidden=false;document.body.style.overflow="hidden";
   $("tEnviado").setAttribute("tabindex","-1");$("tEnviado").focus({preventScroll:true});
 }
 function cerrarModalEnviado(){$("veloEnviado").hidden=true;document.body.style.overflow="";}
 
-$("formCorreo").addEventListener("submit",async e=>{
-  e.preventDefault();
-  const v=$("correo").value.trim(),actual=envio&&envio.correo?envio.correo:"";
-  const err=$("errCorreo");err.classList.remove("ver");
-  if(v&&(v.length>120||!FORMATO_CORREO.test(v))){err.querySelector("span").textContent="Escribe un correo válido, por ejemplo nombre@correo.com, o déjalo en blanco.";err.classList.add("ver");$("correo").focus();return;}
-  if(v===actual||!envio){cerrarModalEnviado();return;}
-  const boton=$("btnListo"),span=boton.querySelector("span"),previo=span.textContent;
-  boton.disabled=true;span.textContent="Guardando…";
-  try{
-    const r=await fetch(API_URL+"/api/cartas/"+envio.id+"/correo",{method:"POST",headers:{"Content-Type":"application/json","X-Token":envio.token},body:JSON.stringify({correo:v})});
-    const d=await r.json().catch(()=>({}));
-    if(!r.ok||!d.ok){err.querySelector("span").textContent=d.error||"No se pudo guardar el correo. Intenta de nuevo.";err.classList.add("ver");return;}
-    envio.correo=d.correo||"";
-    await guardarEnviada();
-    cerrarModalEnviado();
-    aviso(envio.correo?"Correo guardado. ¡Gracias!":"Listo.");
-  }catch(x){
-    err.querySelector("span").textContent="No se pudo guardar. Revisa tu conexión e intenta de nuevo.";err.classList.add("ver");
-  }finally{
-    boton.disabled=false;span.textContent=previo;
-  }
-});
 $("cerrarEnviado").addEventListener("click",cerrarModalEnviado);
+$("btnCerrarEnviado").addEventListener("click",cerrarModalEnviado);
 $("veloEnviado").addEventListener("click",e=>{if(e.target===$("veloEnviado"))cerrarModalEnviado();});
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("veloEnviado").hidden)cerrarModalEnviado();});
 
@@ -1239,8 +1226,47 @@ function iniciarLatido(){
   gestos.forEach(g=>window.addEventListener(g,arrancar,{passive:true}));
 }
 
+const VOLUMEN_MUSICA=0.01;
+const CLAVE_MUSICA="carta-eliana-musica";
+let musicaApagada=false;
+
+function pintarBotonMusica(){
+  const b=$("btnMusica");
+  b.classList.toggle("apagada",musicaApagada);
+  b.querySelector(".ph").className="ph "+(musicaApagada?"ph-speaker-slash":"ph-speaker-high");
+  b.setAttribute("aria-label",musicaApagada?"Activar la música de fondo":"Silenciar la música de fondo");
+}
+
+function iniciarMusica(){
+  const audio=$("musicaFondo");
+  try{musicaApagada=localStorage.getItem(CLAVE_MUSICA)==="off";}catch(e){}
+  audio.volume=VOLUMEN_MUSICA;audio.loop=true;
+  pintarBotonMusica();
+  const sinMusica=()=>{$("btnMusica").hidden=true;};
+  audio.addEventListener("error",sinMusica);
+  if(audio.error)sinMusica();
+  fetch(audio.currentSrc||audio.src,{method:"HEAD"}).then(r=>{if(!r.ok)sinMusica();}).catch(()=>{});
+  audio.addEventListener("ended",()=>{audio.currentTime=0;audio.play().catch(()=>{});});
+
+  const arrancar=()=>{if(musicaApagada||!audio.paused)return;audio.play().catch(()=>{});};
+  const gestos=["pointerdown","keydown","touchend","click"];
+  const alGesto=e=>{
+    if(e.target.closest&&e.target.closest("#btnMusica"))return;
+    if(!audio.paused){gestos.forEach(g=>window.removeEventListener(g,alGesto,true));return;}
+    arrancar();
+  };
+  gestos.forEach(g=>window.addEventListener(g,alGesto,true));
+
+  $("btnMusica").addEventListener("click",()=>{
+    musicaApagada=!musicaApagada;
+    try{localStorage.setItem(CLAVE_MUSICA,musicaApagada?"off":"on");}catch(e){}
+    pintarBotonMusica();
+    if(musicaApagada)audio.pause();else arrancar();
+  });
+}
 async function iniciar(){
   cuentaRegresiva();setInterval(cuentaRegresiva,1000);
+  iniciarMusica();
   await migrarAntigua();
   enviadas=await leerEnviadas();
   pintarContadorEnviadas();
