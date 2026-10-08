@@ -56,6 +56,17 @@
   .info h1{font-size:clamp(1.6rem,3.8vw,2.4rem);font-weight:800;letter-spacing:-.03em;line-height:1.1}
   .info-lugar{display:flex;align-items:center;gap:7px;margin-top:6px;font-size:.92rem;color:var(--texto-suave)}
   .info-lugar .ph{flex:none;font-size:1rem;color:var(--marca)}
+  .cumple{margin-top:12px}
+  .cumple-etiqueta{font-size:.9rem;font-weight:700;color:var(--texto)}
+  .crono{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+  .crono[hidden],.crono .u[hidden]{display:none}
+  .crono .u{min-width:60px;padding:8px 8px 7px;border-radius:12px;background:var(--marca-suave);text-align:center}
+  .crono .u b{display:block;font-size:1.65rem;font-weight:800;line-height:1.1;color:var(--marca-oscuro);font-variant-numeric:tabular-nums}
+  .crono .u small{display:block;margin-top:2px;font-size:.66rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--texto-suave)}
+  .cumple.hoy .crono .u{background:var(--oro-suave)}
+  .cumple.hoy .crono .u b{color:#7a5600}
+  .cumple-pie{margin-top:8px;font-size:.8rem;color:var(--texto-tenue)}
+  .cumple-pie:empty{display:none}
   .info-datos{display:flex;flex-wrap:wrap;align-items:center;gap:8px 20px;margin-top:12px;font-size:.88rem;color:var(--texto-suave)}
   .info-datos>span+span{position:relative}
   .info-datos>span+span::before{content:"•";position:absolute;left:-13px;color:var(--texto-tenue)}
@@ -289,8 +300,17 @@
       <div class="info-txt">
          <h1 id="titulo">Una carta para Eliana</h1>
         <div class="info-lugar"><i class="ph ph-gift" aria-hidden="true"></i>Eliana Mateus Flórez cumple años el 8 de octubre de 2026</div>
+        <div class="cumple" id="cumple">
+          <div class="cumple-etiqueta" id="cumpleEtiqueta"></div>
+          <div class="crono" id="crono" role="timer" aria-live="off">
+            <div class="u" id="uDias"><b id="cDias">00</b><small>días</small></div>
+            <div class="u"><b id="cHoras">00</b><small>horas</small></div>
+            <div class="u"><b id="cMin">00</b><small>min</small></div>
+            <div class="u"><b id="cSeg">00</b><small>seg</small></div>
+          </div>
+          <div class="cumple-pie" id="cumplePie"></div>
+        </div>
         <div class="info-datos">
-          <span><b id="infoDias">Cumpleaños</b></span>
           <span>No se lo cuentes</span>
         </div>
       </div>
@@ -322,6 +342,7 @@
       <input class="grande" type="text" id="nombre" placeholder="Tu nombre" maxlength="80" autocomplete="name">
       <div class="error" id="errNombre" role="alert"><i class="ph ph-warning-circle" aria-hidden="true"></i><span>Escribe tu nombre para firmar la carta.</span></div>
       <div class="firma-demo"><span>Firmarás así</span><strong class="vacio" id="firmaDemo">Tu nombre</strong></div>
+      <p class="nota-privada"><i class="ph ph-eye" aria-hidden="true"></i><span>Mientras escribes, quien organiza la sorpresa puede ver que estás aquí, en qué paso vas y lo que llevas escrito, para saber cómo va todo. Tus fotos solo se envían cuando pulsas «Enviar».</span></p>
       <div class="nav-pasos"><span></span><button type="button" class="btn principal" data-ir="2">Siguiente<i class="ph ph-arrow-right" aria-hidden="true"></i></button></div>
     </section>
 
@@ -505,11 +526,28 @@ const MAX_FOTOS=6;
 const estado={modo:"mano",paginas:[],fotos:[]};
 let aceptoUna=false;
 
+const ANIO_NACIMIENTO=1993;
+
 function cuentaRegresiva(){
-  const h=new Date(),hoy=new Date(h.getFullYear(),h.getMonth(),h.getDate());
-  const dias=Math.round((FECHA_CUMPLE-hoy)/86400000);
-  const txt=dias>1?"Faltan "+dias+" días":dias===1?"Es mañana":dias===0?"¡Es hoy!":"¡Feliz cumpleaños!";
-  ["cuentaTxt","infoDias"].forEach(id=>{const e=$(id);if(e)e.textContent=txt;});
+  const inicio=FECHA_CUMPLE.getTime(),fin=new Date(FECHA_CUMPLE.getFullYear(),FECHA_CUMPLE.getMonth(),FECHA_CUMPLE.getDate()+1).getTime();
+  const edad=FECHA_CUMPLE.getFullYear()-ANIO_NACIMIENTO,anios=edad+" años";
+  const ahora=Date.now();
+  let fase,resto;
+  if(ahora<inicio){fase="antes";resto=inicio-ahora;}
+  else if(ahora<fin){fase="hoy";resto=fin-ahora;}
+  else{fase="despues";resto=0;}
+
+  $("cumple").className="cumple "+fase;
+  $("crono").hidden=fase==="despues";
+  if(fase==="antes")$("cumpleEtiqueta").textContent="Faltan para que Eliana cumpla "+anios;
+  else if(fase==="hoy")$("cumpleEtiqueta").textContent="🎂 ¡Hoy Eliana está cumpliendo "+anios+"! Su cumpleaños termina en";
+  else $("cumpleEtiqueta").textContent="🎉 ¡Eliana cumplió "+anios+"!";
+  $("cumplePie").textContent=fase==="despues"?"Su cumpleaños fue el 8 de octubre de "+FECHA_CUMPLE.getFullYear()+". ¡Gracias por tu carta!":"";
+
+  const s=Math.floor(resto/1000),dd=Math.floor(s/86400),hh=Math.floor(s%86400/3600),mm=Math.floor(s%3600/60),ss=s%60;
+  const p=n=>String(n).padStart(2,"0");
+  $("cDias").textContent=p(dd);$("cHoras").textContent=p(hh);$("cMin").textContent=p(mm);$("cSeg").textContent=p(ss);
+  $("uDias").hidden=fase==="hoy";
 }
 
 function aviso(texto){
@@ -1202,7 +1240,7 @@ function iniciarLatido(){
 }
 
 async function iniciar(){
-  cuentaRegresiva();
+  cuentaRegresiva();setInterval(cuentaRegresiva,1000);
   await migrarAntigua();
   enviadas=await leerEnviadas();
   pintarContadorEnviadas();
